@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+<div style="margin-bottom: 10px;">
+    <button type="button" class="button btn-secondary" onclick="window.print();">🖨️ Print This Page</button>
+</div>
+{{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+@media print {
+    /* Hide Django admin header, sidebar, breadcrumbs, and action buttons */
+    #header, #nav-sidebar, .breadcrumbs, .submit-row, .button {
+        display: none;
+    }
+    .content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog - Justice for Joshua</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+{% include 'tracker/partials/navbar.html' %}
+<main class="pt-5 mt-5"></main>
+
+<!-- Blog List -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h1 class="text-center mb-5 fw-bold">Blog Posts</h1>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        {% for post in posts %}
+          <div class="card mb-4 shadow-sm border-0">
+            {% if post.image %}
+              <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+            {% endif %}
+            <div class="card-body">
+              <h2 class="card-title">{{ post.title }}</h2>
+              <p class="card-text text-muted">{{ post.created_at|date:"F j, Y" }}</p>
+              {% if post.excerpt %}
+                <p class="card-text">{{ post.excerpt }}</p>
+              {% else %}
+                <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+              {% endif %}
+              <a href="{% url 'blog_detail' slug=post.slug %}" class="btn btn-primary">Read More</a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-center text-muted">No blog posts available yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-4 mt-5">
+  <small>Justice for Joshua © {{ now|date:"Y" }}. All rights reserved.</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

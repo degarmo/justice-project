@@ -1,0 +1,124 @@
+{% load static %}
+{% load report_extras %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visitor Behavior Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .details { display: none; }
+        .show-btn { cursor: pointer; color: blue; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Visitor Behavior Report</h1>
+
+    <!-- Date Filter -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-4">
+            <label>Start Date:</label>
+            <input type="date" name="start" class="form-control" value="{{ start_date }}">
+        </div>
+        <div class="col-md-4">
+            <label>End Date:</label>
+            <input type="date" name="end" class="form-control" value="{{ end_date }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </div>
+    </form>
+
+    <!-- AI Summary -->
+    <div class="alert alert-info">
+        <strong>AI Summary:</strong>
+        <p>{{ ai_summary|default:"No data available for the selected period." }}</p>
+    </div>
+
+    <!-- Visit Counts -->
+    <h2>Visit Counts</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Fingerprint Hash</th>
+                <th>Visit Count</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in visit_counts %}
+                <tr>
+                    <td>{{ entry.ip_address }}</td>
+                    <td>{{ entry.fingerprint_hash|default:"N/A" }}</td>
+                    <td>{{ entry.visits }}</td>
+                    <td><span class="show-btn" onclick="toggleDetails('{{ forloop.counter0 }}')">Show Details</span></td>
+                </tr>
+                <tr id="details-{{ forloop.counter0 }}" class="details">
+                    <td colspan="4">
+                        {% get_visitor detailed_data entry.ip_address entry.fingerprint_hash as visitor %}
+                        {% if visitor %}
+                            <strong>Location:</strong> {{ visitor.city }}, {{ visitor.region }}, {{ visitor.country }}<br>
+                            <strong>Browser:</strong> {{ visitor.browser }} ({{ visitor.os }})<br>
+                            <strong>Device:</strong> {{ visitor.device }}<br>
+                            <strong>VPN:</strong> {% if visitor.vpn_status %}Yes{% else %}No{% endif %} |
+                            <strong>Tor:</strong> {% if visitor.tor_status %}Yes{% else %}No{% endif %}<br>
+                            <strong>Fingerprint:</strong> {{ visitor.fingerprint_hash }}<br>
+                            <strong>User Agent:</strong> {{ visitor.user_agent }}<br>
+                            <hr>
+                            <strong>Behaviors:</strong>
+                            <ul>
+                                {% for behavior in visitor.behaviors %}
+                                    <li>{{ behavior.timestamp }} - {{ behavior.event_type }}</li>
+                                {% empty %}
+                                    <li>No behavior data.</li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+                            <strong>Tip Submitted:</strong>
+                            {% if visitor.tip %}
+                                <p><strong>Name:</strong> {{ visitor.tip.name }}<br>
+                                <strong>Email:</strong> {{ visitor.tip.email }}<br>
+                                <strong>Phone:</strong> {{ visitor.tip.phone }}<br>
+                                <strong>Message:</strong> {{ visitor.tip.message }}</p>
+                            {% else %}
+                                <p>No tip submitted.</p>
+                            {% endif %}
+                        {% else %}
+                            <p>No visitor data available.</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center">No visitors found in this range.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Geo Data -->
+    <h2 class="mt-5">Geo Data</h2>
+    <ul>
+        {% for geo in geo_data %}
+            <li>Latitude: {{ geo.latitude }}, Longitude: {{ geo.longitude }}</li>
+        {% empty %}
+            <li>No geo data available.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+function toggleDetails(id) {
+    const details = document.getElementById('details-' + id);
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'table-row';
+    } else {
+        details.style.display = 'none';
+    }
+}
+</script>
+
+</body>
+</html>

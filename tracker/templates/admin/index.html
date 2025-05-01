@@ -1,0 +1,72 @@
+{% extends "admin/index.html" %}
+{% load static %}  
+{% block content %}
+<style>
+    /* Nervous Sidebar */
+    #nervous-sidebar {
+        position: fixed;
+        top: 80px; /* below the navbar */
+        right: 20px;
+        width: 300px;
+        max-height: 100vh;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        padding: 15px;
+        z-index: 1050;
+        border-radius: 8px;
+    }
+    #nervous-sidebar h5 {
+        font-weight: bold;
+        color: #dc3545;
+    }
+</style>
+
+    {{ block.super }}
+    <h2>Visitor Map</h2>
+    <div id="map" style="height: 500px;"></div>
+
+    <!-- Leaflet JS & CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Custom Map Script -->
+    <script src="{% static 'tracker/admin_map.js' %}"></script>
+
+
+<div id="nervous-sidebar" class="container mt-4">
+    <h2>🚨 Nervous Visitors (Last 72 Hours)</h2>
+    {% if nervous_visitors %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>IP Address</th>
+                    <th>Fingerprint Hash</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Nervousness Score</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in nervous_visitors %}
+                    <tr>
+                        <td>{{ item.visitor.ip_address }}</td>
+                        <td>{{ item.visitor.fingerprint_hash|default:"N/A" }}</td>
+                        <td>{{ item.visitor.latitude|default:"N/A" }}</td>
+                        <td>{{ item.visitor.longitude|default:"N/A" }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ item.score }}</span></td>
+                        <td>{{ item.visitor.timestamp }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-success" role="alert">
+            No nervous visitors detected in the past 72 hours.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

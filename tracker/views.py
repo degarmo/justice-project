@@ -1,0 +1,176 @@
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.serializers import serialize
+from .models import VisitorLog, TipSubmission, BehavioralLog
+from .forms import TipSubmissionForm
+import json
+
+
+def index(request):
+    visitor_ip = get_client_ip(request)
+    visitor_log = VisitorLog.objects.filter(ip_address=visitor_ip).order_by('-timestamp').first()
+    latest_post = BlogPost.objects.order_by('-created_at').first()
+
+
+
+    if request.method == 'POST':
+        form = TipSubmissionForm(request.POST)
+        if form.is_valid():
+            tip = form.save(commit=False)
+            tip.visitor_log = visitor_log  # Link to visitor log
+            tip.save()
+            print("Tip saved:", tip)  # Debug line
+            return redirect('index')
+    else:
+        form = TipSubmissionForm()
+
+    return render(request, 'tracker/index.html', {'form': form})
+
+
+def visitor_logs_api(request):
+    logs = VisitorLog.objects.all().values(
+        'ip_address', 'isp', 'asn', 'city', 'region', 'country',
+        'latitude', 'longitude', 'browser', 'os', 'device',
+        'vpn_status', 'tor_status', 'fingerprint_hash',
+        'referrer', 'user_agent', 'timestamp'
+    )
+    return JsonResponse(list(logs), safe=False)
+
+
+def tip_submissions_api(request):
+    tips = TipSubmission.objects.select_related('visitor_log').all()
+    data = []
+    for tip in tips:
+        log = tip.visitor_log
+        data.append({
+            'name': tip.name,
+            'email': tip.email,
+            'phone': tip.phone,
+            'message': tip.message,
+            'timestamp': tip.timestamp,
+            # VisitorLog data
+            'ip_address': log.ip_address if log else None,
+            'isp': log.isp if log else None,
+            'asn': log.asn if log else None,
+            'city': log.city if log else None,
+            'region': log.region if log else None,
+            'country': log.country if log else None,
+            'latitude': log.latitude if log else None,
+            'longitude': log.longitude if log else None,
+            'browser': log.browser if log else None,
+            'os': log.os if log else None,
+            'device': log.device if log else None,
+            'vpn_status': log.vpn_status if log else None,
+            'tor_status': log.tor_status if log else None,
+            'fingerprint_hash': log.fingerprint_hash if log else None,
+            'referrer': log.referrer if log else None,
+            'user_agent': log.user_agent if log else None,
+        })
+    return JsonResponse(data, safe=False)
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+@csrf_exempt
+def log_behavior(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+
+        # Find visitor log
+        visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+
+        if visitor:
+            BehavioralLog.objects.create(
+                visitor=visitor,  # Correct field name here
+                event_type=data.get('type'),
+                data=data,
+            )
+            return JsonResponse({'status': 'behavior logged'})
+        else:
+            return JsonResponse({'error': 'Visitor not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+@csrf_exempt
+def fingerprint_log(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        fingerprint = data.get('fingerprint')
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+
+        visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+
+        if visitor:
+            visitor.fingerprint_hash = fingerprint
+
+            # Populate extended fingerprint data
+            visitor.timezone = data.get('timezone')
+            screen = data.get('screen')
+            if screen:
+                visitor.screen_resolution = f"{screen.get('width', 'unknown')}x{screen.get('height', 'unknown')}"
+                visitor.color_depth = screen.get('colorDepth', 'unknown')
+            else:
+                visitor.screen_resolution = 'unknown'
+                visitor.color_depth = 'unknown'
+
+            visitor.languages = data.get('languages')
+            visitor.platform = data.get('platform')
+            visitor.touch_support = data.get('touch_support', False)
+            visitor.adblocker = data.get('adblocker', False)
+            visitor.incognito = data.get('incognito', False)
+
+            visitor.save()
+            return JsonResponse({'status': 'fingerprint saved'})
+        else:
+            return JsonResponse({'error': 'Visitor not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+def report_view(request):
+    visitors = VisitorLog.objects.all()
+    behaviors = BehavioralLog.objects.all()
+    tips = TipSubmission.objects.all()
+    # Example: Combine as needed
+    data = {
+        'visitors': serialize('json', visitors),
+        'behaviors': serialize('json', behaviors),
+        'tips': serialize('json', tips),
+    }
+    return JsonResponse(data)
+
+from django.shortcuts import render, get_object_or_404
+from .models import BlogPost
+
+def blog_list(request):
+    posts = BlogPost.objects.order_by('-created_at')
+    return render(request, 'tracker/blog_list.html', {'posts': posts})
+
+def blog_detail(request, slug):
+    post = get_object_or_404(BlogPost, slug=slug)
+    return render(request, 'tracker/blog_detail.html', {'post': post})
+
+def home_with_latest_post(request):
+    latest_post = BlogPost.objects.order_by('-created_at').first()
+    return render(request, 'tracker/index.html', {'latest_post': latest_post})
+
+def blog_detail(request, slug):
+    post = get_object_or_404(BlogPost, slug=slug)
+    return render(request, 'tracker/blog_detail.html', {'post': post})
+
+def index(request):
+    latest_post = BlogPost.objects.order_by('-created_at').first()
+    return render(request, 'tracker/index.html', {
+        'form': TipSubmissionForm(),
+        'latest_post': latest_post
+    })
