@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'justice_db',  # ✅ corrected
         'USER': 'justice_admin',
         'PASSWORD': 'p@ssW0rd123',
-        'HOST': 'justice-project-db.render.internal',
+        'HOST': 'justice-project-db.render.com',
         'PORT': '5432',
     }
 }
