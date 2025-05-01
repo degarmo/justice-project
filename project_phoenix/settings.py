@@ -80,9 +80,14 @@ WSGI_APPLICATION = 'project_phoenix.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'justice-project-db',
+        'USER': 'justice_admin',
+        'PASSWORD': 'p@ssW0rd123',
+        'HOST': 'justice-project-db.render.internal',
+        'PORT': '5432',
+    }
 }
 
 
