@@ -1,3 +1,6 @@
+import dj_database_url
+import os
+
 """
 Django settings for project_phoenix project.
 
@@ -77,14 +80,9 @@ WSGI_APPLICATION = 'project_phoenix.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'investigation_db',
-        'USER': 'investigator',
-        'PASSWORD': 'Zuzu2247!!!',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 
