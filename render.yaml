@@ -3,7 +3,7 @@ services:
     name: justice-project
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn justice-project.wsgi
+    startCommand: gunicorn project_phoenix.wsgi
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: project_phoenix.settings
