@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: justice-project
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn project_phoenix.wsgi
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: project_phoenix.settings
+      - key: SECRET_KEY
+        value: your-secret-key
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: your-subdomain.onrender.com
