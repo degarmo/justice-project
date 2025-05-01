@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'project_phoenix.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'justice_db',  # ✅ corrected
+        'NAME': 'justice_db',
         'USER': 'justice_admin',
         'PASSWORD': 'p@ssW0rd123',
-        'HOST': 'justice-project-db.render.com',
+        'HOST': 'dpg-abc12345.pg.render.com',  # ✅ NOT render.com or render.internal
         'PORT': '5432',
     }
 }
