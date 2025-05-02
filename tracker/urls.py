@@ -15,6 +15,8 @@ urlpatterns = [
     path('api/fingerprint-log/', views.fingerprint_log, name='fingerprint_log'),
     path('log-behavior/', views.log_behavior, name='log_behavior'),
     
+
+    
     
     # Blog URLs
     path('blog/', views.blog_list, name='blog_list'),
