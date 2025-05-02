@@ -5,6 +5,40 @@ from django.core.serializers import serialize
 from .models import VisitorLog, TipSubmission, BehavioralLog
 from .forms import TipSubmissionForm
 import json
+import json, requests
+import requests
+
+
+def get_ip_data(ip):
+    try:
+        response = requests.get(f'https://ipapi.co/{ip}/json/')
+        if response.status_code == 200:
+            return response.json()
+    except:
+        pass
+    return {}
+
+@csrf_exempt
+def log_visitor(request):
+    if request.method == 'POST':
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+        ip_data = get_ip_data(ip)
+
+        VisitorLog.objects.create(
+            ip_address=ip,
+            isp=ip_data.get('org'),
+            asn=ip_data.get('asn'),
+            city=ip_data.get('city'),
+            region=ip_data.get('region'),
+            country=ip_data.get('country_name'),
+            latitude=ip_data.get('latitude'),
+            longitude=ip_data.get('longitude'),
+            # other fields...
+        )
+
+        return JsonResponse({'status': 'visitor logged'})
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
 
 
 def index(request):
@@ -174,3 +208,5 @@ def index(request):
         'form': TipSubmissionForm(),
         'latest_post': latest_post
     })
+
+
