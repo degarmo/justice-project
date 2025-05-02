@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from tracker import views  # ✅ this line is missing
+
 
 urlpatterns = [
     path('', views.index, name='index'),  # Homepage
@@ -10,6 +12,7 @@ urlpatterns = [
     path('api/behavior-log/', views.log_behavior, name='behavior_log'),
     path('api/fingerprint-log/', views.fingerprint_log, name='fingerprint_log'),
     path('log-behavior/', views.log_behavior, name='log_behavior'),
+    
     
     # Blog URLs
     path('blog/', views.blog_list, name='blog_list'),
