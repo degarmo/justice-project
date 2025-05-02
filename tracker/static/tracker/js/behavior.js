@@ -55,6 +55,16 @@
         sendBehavior({ type: document.hidden ? 'tab_blur' : 'tab_focus', time: now });
     });
 
+    function sendBehavior(data) {
+        console.log("Sending behavior:", data);
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(res => console.log("Response:", res.status));
+    }
+    
+
     // --- Idle detection ---
     function resetIdleTimer() {
         clearTimeout(idleTimer);
