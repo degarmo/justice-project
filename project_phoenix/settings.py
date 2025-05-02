@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'justice_db',
         'USER': 'justice_admin',
         'PASSWORD': 'p@ssW0rd123',
-        'HOST': 'dpg-abc12345.pg.render.com',  # ✅ NOT render.com or render.internal
+        'HOST': 'dpg-justice-project-db.pg.render.com',  
         'PORT': '5432',
     }
 }
