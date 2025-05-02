@@ -1,8 +1,10 @@
 from django.urls import path
-from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from tracker import views  # ✅ this line is missing
+from django.contrib import admin
+from django.urls import path, include
+from tracker import views  # ✅ This line fixes the NameError
 
 
 urlpatterns = [
