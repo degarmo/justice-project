@@ -14,7 +14,7 @@ urlpatterns = [
     path('api/behavior-log/', views.log_behavior, name='behavior_log'),
     path('api/fingerprint-log/', views.fingerprint_log, name='fingerprint_log'),
     path('log-behavior/', views.log_behavior, name='log_behavior'),
-    
+
 
     
     
