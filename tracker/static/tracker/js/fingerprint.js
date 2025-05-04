@@ -1,4 +1,4 @@
-// fingerprint.js
+// /tracker/static/tracker/js/fingerprint.js
 
 function detectAdblocker() {
     const bait = document.createElement('div');
@@ -22,35 +22,32 @@ function detectIncognitoMode() {
 }
 
 async function sendFingerprint() {
-    const data = {
-        fingerprint_hash: crypto.randomUUID(),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        screen_resolution: `${window.screen.width}x${window.screen.height}`,
-        color_depth: window.screen.colorDepth,
-        languages: navigator.languages,
-        platform: navigator.platform,
-        touch_support: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-        adblocker: detectAdblocker(),
-        incognito: await detectIncognitoMode()
-    };
+    try {
+        const fpPromise = FingerprintJS.load();
+        const fp = await fpPromise.then(f => f.get());
 
-    fetch('/api/fingerprint-log/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            fingerprint_hash: fp,
+        const data = {
+            fingerprint_hash: fp.visitorId,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            screen_resolution: `${screen.width}x${screen.height}`,
-            color_depth: screen.colorDepth,
+            screen_resolution: `${window.screen.width}x${window.screen.height}`,
+            color_depth: window.screen.colorDepth,
             languages: navigator.languages,
             platform: navigator.platform,
-            touch_support: 'ontouchstart' in window,
-            adblocker: detectAdBlocker(), // if you added this
-            incognito: await isIncognito() // if async logic exists
-        })
-    });
+            touch_support: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+            adblocker: detectAdblocker(),
+            incognito: await detectIncognitoMode()
+        };
+
+        await fetch('/api/fingerprint-log/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+    } catch (err) {
+        console.error("Error sending fingerprint:", err);
+    }
 }
 
 window.addEventListener('load', sendFingerprint);
