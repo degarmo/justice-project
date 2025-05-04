@@ -8,6 +8,7 @@ import json
 import json, requests
 import requests
 
+
 def get_ip_data(ip):
     try:
         response = requests.get(f'https://ipapi.co/{ip}/json/')
@@ -126,21 +127,30 @@ def get_client_ip(request):
 @csrf_exempt
 def log_behavior(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+        try:
+            data = json.loads(request.body)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
 
-        # Find visitor log
-        visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+            print("💬 Received behavior data:", data)
+            print("🌐 IP Address:", ip)
 
-        if visitor:
-            BehavioralLog.objects.create(
-                visitor=visitor,  # Correct field name here
-                event_type=data.get('type'),
-                data=data,
-            )
-            return JsonResponse({'status': 'behavior logged'})
-        else:
-            return JsonResponse({'error': 'Visitor not found'}, status=404)
+            # Find visitor based on IP (optional: fingerprint later)
+            visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+
+            if visitor:
+                BehavioralLog.objects.create(
+                    visitor=visitor,
+                    event_type=data.get('type'),
+                    data=data
+                )
+                return JsonResponse({'status': 'behavior logged'})
+            else:
+                print("⚠️ Visitor not found")
+                return JsonResponse({'error': 'Visitor not found'}, status=404)
+
+        except Exception as e:
+            print("❌ Error parsing behavior data:", str(e))
+            return JsonResponse({'error': 'Bad request', 'details': str(e)}, status=400)
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
