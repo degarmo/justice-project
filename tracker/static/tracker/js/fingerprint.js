@@ -50,6 +50,7 @@ async function sendFingerprint() {
             adblocker: detectAdBlocker(), // if you added this
             incognito: await isIncognito() // if async logic exists
         })
+    });
 }
 
 window.addEventListener('load', sendFingerprint);
