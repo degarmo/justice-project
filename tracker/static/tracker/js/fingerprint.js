@@ -39,8 +39,17 @@ async function sendFingerprint() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
-    }).catch(err => console.error('Fingerprint log error:', err));
+        body: JSON.stringify({
+            fingerprint_hash: fp,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            screen_resolution: `${screen.width}x${screen.height}`,
+            color_depth: screen.colorDepth,
+            languages: navigator.languages,
+            platform: navigator.platform,
+            touch_support: 'ontouchstart' in window,
+            adblocker: detectAdBlocker(), // if you added this
+            incognito: await isIncognito() // if async logic exists
+        })
 }
 
 window.addEventListener('load', sendFingerprint);
