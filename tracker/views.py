@@ -12,11 +12,23 @@ import requests
 def get_ip_data(ip):
     try:
         response = requests.get(f'https://ipapi.co/{ip}/json/')
+        print(response.text)
         if response.status_code == 200:
-            return response.json()
-    except:
-        pass
-    return {}
+            data = response.json()
+            if 'error' not in data:
+                return data
+    except Exception as e:
+        print(f"IP lookup failed: {e}")
+    return {
+        'org': '',
+        'asn': '',
+        'city': '',
+        'region': '',
+        'country_name': '',
+        'latitude': None,
+        'longitude': None
+    }
+
 
 @csrf_exempt
 def log_visitor(request):
@@ -35,7 +47,6 @@ def log_visitor(request):
             longitude=ip_data.get('longitude'),
             # other fields...
         )
-
         return JsonResponse({'status': 'visitor logged'})
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
