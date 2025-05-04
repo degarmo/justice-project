@@ -160,28 +160,32 @@ def fingerprint_log(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+            print('Received fingerprint data:', data)  # <-- log it for review
 
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
             visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
-            if not visitor:
+
+            if visitor:
+                visitor.fingerprint_hash = data.get('fingerprint_hash')
+                visitor.timezone = data.get('timezone')
+                visitor.screen_resolution = data.get('screen_resolution')
+                visitor.color_depth = data.get('color_depth')
+                visitor.languages = data.get('languages')
+                visitor.platform = data.get('platform')
+                visitor.touch_support = data.get('touch_support', False)
+                visitor.adblocker = data.get('adblocker', False)
+                visitor.incognito = data.get('incognito', False)
+                visitor.save()
+
+                return JsonResponse({'status': 'fingerprint logged'})
+            else:
                 return JsonResponse({'error': 'Visitor not found'}, status=404)
 
-            visitor.fingerprint_hash = data.get('fingerprint_hash')
-            visitor.timezone = data.get('timezone')
-            visitor.screen_resolution = data.get('screen_resolution')
-            visitor.color_depth = data.get('color_depth')
-            visitor.languages = data.get('languages')
-            visitor.platform = data.get('platform')
-            visitor.touch_support = data.get('touch_support')
-            visitor.adblocker = data.get('adblocker')
-            visitor.incognito = data.get('incognito')
-            visitor.save()
-
-            return JsonResponse({'status': 'Fingerprint saved'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
 
 
 def report_view(request):

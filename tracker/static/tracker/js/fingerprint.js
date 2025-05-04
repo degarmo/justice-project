@@ -22,32 +22,27 @@ function detectIncognitoMode() {
 }
 
 async function sendFingerprint() {
-    try {
-        const fpPromise = FingerprintJS.load();
-        const fp = await fpPromise.then(f => f.get());
+    const incognito = await detectIncognitoMode();
 
-        const data = {
-            fingerprint_hash: fp.visitorId,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            screen_resolution: `${window.screen.width}x${window.screen.height}`,
-            color_depth: window.screen.colorDepth,
-            languages: navigator.languages,
-            platform: navigator.platform,
-            touch_support: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-            adblocker: detectAdblocker(),
-            incognito: await detectIncognitoMode()
-        };
+    const data = {
+        fingerprint_hash: crypto.randomUUID(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        screen_resolution: `${window.screen.width}x${window.screen.height}`,
+        color_depth: window.screen.colorDepth,
+        languages: navigator.languages,
+        platform: navigator.platform,
+        touch_support: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+        adblocker: detectAdblocker(),
+        incognito: incognito
+    };
 
-        await fetch('/api/fingerprint-log/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-    } catch (err) {
-        console.error("Error sending fingerprint:", err);
-    }
+    fetch('/api/fingerprint-log/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
 }
 
 window.addEventListener('load', sendFingerprint);
