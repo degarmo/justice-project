@@ -1,0 +1,21 @@
+@csrf_exempt
+def fingerprint_log(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+        visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+        if visitor:
+            # Update visitor with fingerprint fields
+            visitor.fingerprint_hash = data.get('fingerprint_hash')
+            visitor.timezone = data.get('timezone')
+            visitor.screen_resolution = data.get('screen_resolution')
+            visitor.color_depth = data.get('color_depth')
+            visitor.languages = data.get('languages')
+            visitor.platform = data.get('platform')
+            visitor.touch_support = data.get('touch_support')
+            visitor.adblocker = data.get('adblocker')
+            visitor.incognito = data.get('incognito')
+            visitor.save()
+            return JsonResponse({'status': 'fingerprint saved'})
+        return JsonResponse({'error': 'Visitor not found'}, status=404)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
