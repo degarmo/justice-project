@@ -2,128 +2,110 @@
 
 (function () {
     const endpoint = '/log-behavior/';
-    let mouseMoves = [];
-    let clickEvents = [];
+    const batchInterval = 10000; // send every 10 seconds
+    const idleThreshold = 30000;
+
+    let behaviorQueue = [];
     let lastMouseLog = Date.now();
     let lastScrollTime = null;
     let lastClickTime = null;
     let idleTimer;
-    const idleThreshold = 30000; // 30 seconds
 
-    // --- Mouse movement tracking (sampled every 500ms) ---
+    // --- Add to queue ---
+    function queueBehavior(event) {
+        behaviorQueue.push(event);
+    }
+
+    // --- Mouse movement (sampled) ---
     document.addEventListener('mousemove', (e) => {
         const now = Date.now();
         if (now - lastMouseLog > 500) {
-            mouseMoves.push({ x: e.clientX, y: e.clientY, time: now });
+            queueBehavior({ type: 'mousemove', x: e.clientX, y: e.clientY, time: now });
             lastMouseLog = now;
         }
     });
 
-    // --- Click tracking ---
+    // --- Click ---
     document.addEventListener('click', (e) => {
         const now = Date.now();
-        clickEvents.push({ x: e.clientX, y: e.clientY, element: e.target.tagName, time: now });
+        queueBehavior({ type: 'click', x: e.clientX, y: e.clientY, element: e.target.tagName, time: now });
 
-        // ✅ Send click behavior
-        sendBehavior({ type: 'click', x: e.clientX, y: e.clientY, element: e.target.tagName, time: now });
-
-        // Impulsive click+scroll check
         if (lastScrollTime && now - lastScrollTime < 800) {
-            sendBehavior({ type: 'impulsive_action', time: now });
+            queueBehavior({ type: 'impulsive_action', time: now });
         }
 
         lastClickTime = now;
         resetIdleTimer();
     });
 
-
-    // --- Scroll tracking ---
+    // --- Scroll ---
     window.addEventListener('scroll', () => {
         const now = Date.now();
         const scrollDepth = Math.round((window.scrollY + window.innerHeight) / document.body.scrollHeight * 100);
+        queueBehavior({ type: 'scroll', depth: scrollDepth, time: now });
 
-        sendBehavior({ type: 'scroll', depth: scrollDepth, time: now });
-
-        // Rapid scroll detection
         if (lastScrollTime && now - lastScrollTime < 500) {
-            sendBehavior({ type: 'rapid_scroll', time: now });
+            queueBehavior({ type: 'rapid_scroll', time: now });
         }
 
         lastScrollTime = now;
         resetIdleTimer();
     });
 
-    // --- Tab focus/blur detection ---
+    // --- Visibility (tab) change ---
     document.addEventListener('visibilitychange', () => {
-        const now = Date.now();
-        sendBehavior({ type: document.hidden ? 'tab_blur' : 'tab_focus', time: now });
+        queueBehavior({ type: document.hidden ? 'tab_blur' : 'tab_focus', time: Date.now() });
     });
 
-    function sendBehavior(data) {
-        console.log("Sending behavior:", data);
-        fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(res => console.log("Response:", res.status));
-    }
-    
+    // --- Hover tracking ---
+    const tags = ['P', 'H1', 'H2', 'H3', 'A', 'BUTTON'];
+    tags.forEach(tag => {
+        document.querySelectorAll(tag).forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                queueBehavior({ type: 'hover', element: tag, time: Date.now() });
+            });
+        });
+    });
+
     // --- Idle detection ---
     function resetIdleTimer() {
         clearTimeout(idleTimer);
         idleTimer = setTimeout(() => {
-            sendBehavior({ type: 'idle', time: Date.now() });
+            queueBehavior({ type: 'idle', time: Date.now() });
         }, idleThreshold);
     }
+
     ['mousemove', 'keydown', 'scroll', 'click'].forEach(event => {
         document.addEventListener(event, resetIdleTimer);
     });
     resetIdleTimer();
 
-    // --- Hover tracking for curiosity markers ---
-    const curiosityElements = ['P', 'H1', 'H2', 'H3', 'A', 'BUTTON'];
-    curiosityElements.forEach(tag => {
-        document.querySelectorAll(tag).forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                sendBehavior({ type: 'hover', element: tag, time: Date.now() });
-            });
-        });
-    });
+    // --- Batch sender ---
+    function sendBatch() {
+        if (!behaviorQueue.length) return;
 
-    // --- Periodic mouse path sender (every 10s) ---
-    setInterval(() => {
-        if (mouseMoves.length) {
-            sendBehavior({ type: 'mouse_path', path: mouseMoves });
-            mouseMoves = [];
-        }
-    }, 10000);
+        const payload = {
+            type: 'batch',
+            events: behaviorQueue
+        };
 
-    // --- Send data to backend ---
-    function sendBehavior(data) {
         fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        fetch('/log-behavior/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         }).catch(err => {
-            console.error('Behavior log error:', err);
+            console.error('Behavior log batch error:', err);
         });
+
+        behaviorQueue = [];
     }
-    fetch('/log-behavior/', {
+
+    setInterval(sendBatch, batchInterval);
+
+    // --- Startup test ping (optional) ---
+    fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ type: 'test_click', timestamp: Date.now() })
-      })
-      .then(res => res.json())
-      .then(console.log)
-      .catch(console.error);
-      
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'startup_ping', time: Date.now() })
+    }).then(res => res.json()).then(console.log).catch(console.error);
 })();
