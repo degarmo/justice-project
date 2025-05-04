@@ -158,35 +158,28 @@ def log_behavior(request):
 @csrf_exempt
 def fingerprint_log(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        fingerprint = data.get('fingerprint')
-        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
+        try:
+            data = json.loads(request.body)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')).split(',')[0]
 
-        visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+            visitor = VisitorLog.objects.filter(ip_address=ip).order_by('-timestamp').first()
+            if not visitor:
+                return JsonResponse({'error': 'Visitor not found'}, status=404)
 
-        if visitor:
-            visitor.fingerprint_hash = fingerprint
-
-            # Populate extended fingerprint data
+            visitor.fingerprint_hash = data.get('fingerprint_hash')
             visitor.timezone = data.get('timezone')
-            screen = data.get('screen')
-            if screen:
-                visitor.screen_resolution = f"{screen.get('width', 'unknown')}x{screen.get('height', 'unknown')}"
-                visitor.color_depth = screen.get('colorDepth', 'unknown')
-            else:
-                visitor.screen_resolution = 'unknown'
-                visitor.color_depth = 'unknown'
-
+            visitor.screen_resolution = data.get('screen_resolution')
+            visitor.color_depth = data.get('color_depth')
             visitor.languages = data.get('languages')
             visitor.platform = data.get('platform')
-            visitor.touch_support = data.get('touch_support', False)
-            visitor.adblocker = data.get('adblocker', False)
-            visitor.incognito = data.get('incognito', False)
-
+            visitor.touch_support = data.get('touch_support')
+            visitor.adblocker = data.get('adblocker')
+            visitor.incognito = data.get('incognito')
             visitor.save()
-            return JsonResponse({'status': 'fingerprint saved'})
-        else:
-            return JsonResponse({'error': 'Visitor not found'}, status=404)
+
+            return JsonResponse({'status': 'Fingerprint saved'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
