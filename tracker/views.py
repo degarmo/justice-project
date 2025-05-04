@@ -7,6 +7,14 @@ from .forms import TipSubmissionForm
 import json
 import json, requests
 import requests
+# views.py
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+
+@staff_member_required
+def custom_dashboard(request):
+    return render(request, 'dashboard.html')
+
 
 
 def get_ip_data(ip):

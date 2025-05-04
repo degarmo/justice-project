@@ -6,4 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tracker.urls')),
     path('log-behavior/', views.log_behavior, name='log_behavior'),  # ✅ Now this works
+    path('dashboard/', views.custom_dashboard, name='custom_dashboard'),
 ]
