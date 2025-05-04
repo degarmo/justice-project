@@ -24,6 +24,9 @@
         const now = Date.now();
         clickEvents.push({ x: e.clientX, y: e.clientY, element: e.target.tagName, time: now });
 
+        // ✅ Send click behavior
+        sendBehavior({ type: 'click', x: e.clientX, y: e.clientY, element: e.target.tagName, time: now });
+
         // Impulsive click+scroll check
         if (lastScrollTime && now - lastScrollTime < 800) {
             sendBehavior({ type: 'impulsive_action', time: now });
@@ -32,6 +35,7 @@
         lastClickTime = now;
         resetIdleTimer();
     });
+
 
     // --- Scroll tracking ---
     window.addEventListener('scroll', () => {
