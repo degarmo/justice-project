@@ -115,4 +115,15 @@
             console.error('Behavior log error:', err);
         });
     }
+    fetch('/log-behavior/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type: 'test_click', timestamp: Date.now() })
+      })
+      .then(res => res.json())
+      .then(console.log)
+      .catch(console.error);
+      
 })();

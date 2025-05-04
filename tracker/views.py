@@ -8,7 +8,6 @@ import json
 import json, requests
 import requests
 
-
 def get_ip_data(ip):
     try:
         response = requests.get(f'https://ipapi.co/{ip}/json/')
