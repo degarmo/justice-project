@@ -64,7 +64,6 @@
         }).then(res => console.log("Response:", res.status));
     }
     
-
     // --- Idle detection ---
     function resetIdleTimer() {
         clearTimeout(idleTimer);
@@ -101,6 +100,15 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
+        });
+        fetch('/log-behavior/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).catch(err => {
+            console.error('Behavior log error:', err);
         });
     }
 })();
