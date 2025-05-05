@@ -155,6 +155,16 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome to the Justice Admin Panel",
     "copyright": "Justice Project",
     "search_model": ["tracker.VisitorLog", "tracker.BehaviorLog"],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "custom_links": {
+        "tracker": [{
+            "name": "View Reports",
+            "url": "/admin/tracker/visitorlog/",
+            "icon": "fas fa-chart-line",
+            "permissions": ["tracker.view_visitorlog"]
+        }]
+    },
 
     # Top Menu (Optional)
     "topmenu_links": [
