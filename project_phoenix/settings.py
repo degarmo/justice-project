@@ -149,24 +149,36 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 JAZZMIN_SETTINGS = {
-    "site_title": "My Custom Admin",
-    "site_header": "My Admin Portal",
-    "site_brand": "MyBrand",
-    "welcome_sign": "Welcome to My Admin",
-    "copyright": "My Company ©",
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "custom_links": {
-        "Patient": [{
-            "name": "View on Website",
-            "url": "https://4josh.org",
-            "icon": "fas fa-external-link-alt",
-            "permissions": ["auth.view_user"]
-        }]
-    },
+    "site_title": "Justice Admin",
+    "site_header": "Justice Project Admin",
+    "site_brand": "Justice Dashboard",
+    "welcome_sign": "Welcome to the Justice Admin Panel",
+    "copyright": "Justice Project",
+    "search_model": ["tracker.VisitorLog", "tracker.BehaviorLog"],
+
+    # Top Menu (Optional)
+    "topmenu_links": [
+        {"name": "Home", "url": "/", "permissions": ["auth.view_user"]},
+        {"model": "auth.User"},
+        {"app": "tracker"},
+    ],
+
+    # User Menu (Optional)
+    "usermenu_links": [
+        {"name": "Visit Site", "url": "/", "new_window": True},
+    ],
+
+    # Icons (Optional)
     "icons": {
-        "auth": "fas fa-users-cog",
+        "auth": "fas fa-users",
         "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
+        "auth.Group": "fas fa-users-cog",
+        "tracker.VisitorLog": "fas fa-id-card",
+        "tracker.BehaviorLog": "fas fa-mouse",
     },
+
+    # Hide Apps/Models (Optional)
+    "hide_apps": [],
+    "hide_models": [],
 }
+
