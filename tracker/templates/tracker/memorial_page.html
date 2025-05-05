@@ -4,97 +4,87 @@
 {% block content %}
 <div class="container py-5">
 
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="text-center mb-5">
         <h1 class="display-4">Honor Joshua Terry’s Memory</h1>
-        <p class="lead">
-            We invite you to share a message of love, respect, or support for Josh’s family.
-            Whether you knew him personally or were moved by his story, your words matter.
-        </p>
+        <p class="lead">We invite you to share a message of love, respect, or support for Josh’s family.</p>
     </div>
 
-    <!-- Location Prompt Section -->
-    <div class="bg-light p-4 rounded mb-4">
+    <!-- Location Prompt -->
+    <div class="alert alert-light border rounded p-4 mb-4">
         <h4>Where were you when you heard his story?</h4>
-        <p>
-            By sharing your location, you help Josh’s family see how far his memory has reached.
-            It creates a map of love, strength, and solidarity from across the country.
-        </p>
-        <p class="text-muted small">
-            📍 Your precise location is only shared if you choose to allow it.
-            If not, feel free to share your city and state manually.
-        </p>
+        <p>Share your location to help map the impact of Josh’s story.</p>
+        <button id="getLocationBtn" class="btn btn-outline-primary btn-sm mb-2">📍 Get My Location</button>
+        <p class="small text-muted">You’ll be asked to approve location access. Or, enter city/state manually.</p>
     </div>
 
-    <!-- Form Section -->
+    <!-- Form -->
     <form method="POST" class="needs-validation" novalidate>
         {% csrf_token %}
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
-                {{ form.display_name }}
+                {{ form.display_name|add_class:"form-control" }}
             </div>
             <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
-                {{ form.city }}
+                {{ form.city|add_class:"form-control" }}
             </div>
             <div class="col-md-6">
                 <label for="id_state" class="form-label">State</label>
-                {{ form.state }}
+                {{ form.state|add_class:"form-control" }}
             </div>
             <div class="col-12">
                 <label for="id_message" class="form-label">Message</label>
-                {{ form.message }}
+                {{ form.message|add_class:"form-control" }}
             </div>
+
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.show_location }}
-                    <label class="form-check-label" for="id_show_location">
-                        ✅ Yes, show my location on the Memory Map
-                        <br><small class="text-muted">(You’ll be prompted to approve this in your browser.)</small>
-                    </label>
+                    {{ form.show_location|add_class:"form-check-input" }}
+                    <label class="form-check-label" for="id_show_location">✅ Show my location on the Memory Map</label>
                 </div>
             </div>
+
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.is_anonymous }}
+                    {{ form.is_anonymous|add_class:"form-check-input" }}
                     <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
                 </div>
             </div>
+
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.shared_social }}
+                    {{ form.shared_social|add_class:"form-check-input" }}
                     <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
                 </div>
             </div>
+
             <div class="col-12">
-                <p class="small text-muted mt-2">
-                    We do not store or share your personal details without your consent.
-                    Your name and location will appear only if you allow it,
-                    and only for the purpose of honoring Josh’s life.
-                </p>
+                <p class="text-muted small mt-2">We do not store or share your personal details without your consent.</p>
             </div>
         </div>
 
         <div class="mt-4">
-            <button type="submit" class="btn btn-primary btn-lg">Leave a Message</button>
+            <button type="submit" class="btn btn-primary btn-lg w-100">📨 Leave a Message</button>
         </div>
     </form>
 
+    <!-- Community Messages -->
     <hr class="my-5">
-
-    <!-- Messages Section -->
     <h3 class="mb-4">Messages from the Community</h3>
     {% for msg in messages %}
-        <div class="border rounded p-4 mb-3">
-            <h5>
-                {% if msg.is_anonymous %}Anonymous{% else %}{{ msg.display_name }}{% endif %}
-                {% if msg.show_location %}
-                    <small class="text-muted">from {{ msg.city }}, {{ msg.state }}</small>
-                {% endif %}
-            </h5>
-            <p class="mb-1">{{ msg.message }}</p>
-            <small class="text-muted">{{ msg.created_at|date:"F j, Y, g:i a" }}</small>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {% if msg.is_anonymous %}Anonymous{% else %}{{ msg.display_name }}{% endif %}
+                    {% if msg.show_location %}
+                        <small class="text-muted">from {{ msg.city }}, {{ msg.state }}</small>
+                    {% endif %}
+                </h5>
+                <p class="card-text">{{ msg.message }}</p>
+                <p class="card-text"><small class="text-muted">{{ msg.created_at|date:"F j, Y, g:i a" }}</small></p>
+            </div>
         </div>
     {% empty %}
         <p>No messages yet. Be the first to share one.</p>
@@ -105,4 +95,21 @@
 
 {% block scripts %}
 <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
+<script>
+document.getElementById('getLocationBtn').addEventListener('click', function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Send to your autofill logic
+            fillCityStateFromCoords(lat, lon);
+        }, function (error) {
+            alert("Unable to access location: " + error.message);
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+});
+</script>
 {% endblock %}
