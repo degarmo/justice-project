@@ -1,5 +1,6 @@
 {% extends "tracker/base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="container py-5">
@@ -24,7 +25,7 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
-                {{ form.display_name }}
+                {{ form.display_name|add_class:"form-control" }}
             </div>
             <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
@@ -42,7 +43,9 @@
             <div class="col-12">
                 <div class="form-check">
                     {{ form.show_location|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="id_show_location">✅ Show my location on the Memory Map</label>
+                    <label class="form-check-label" for="id_show_location">
+                        ✅ Show my location on the Memory Map
+                    </label>
                 </div>
             </div>
 
@@ -61,7 +64,9 @@
             </div>
 
             <div class="col-12">
-                <p class="text-muted small mt-2">We do not store or share your personal details without your consent.</p>
+                <p class="text-muted small mt-2">
+                    We do not store or share your personal details without your consent.
+                </p>
             </div>
         </div>
 
@@ -96,14 +101,24 @@
 {% block scripts %}
 <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
 <script>
+function fillCityStateFromCoords(lat, lon) {
+    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('id_city').value = data.city || '';
+                document.getElementById('id_state').value = data.principalSubdivision || '';
+            }
+        })
+        .catch(err => {
+            console.warn("Location lookup failed:", err);
+        });
+}
+
 document.getElementById('getLocationBtn').addEventListener('click', function () {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-
-            // Send to your autofill logic
-            fillCityStateFromCoords(lat, lon);
+            fillCityStateFromCoords(position.coords.latitude, position.coords.longitude);
         }, function (error) {
             alert("Unable to access location: " + error.message);
         });
