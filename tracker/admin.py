@@ -11,6 +11,8 @@ from tracker.utils.ai_analysis import analyze_behavior
 from django.utils.timezone import now
 from .models import BlogPost
 
+
+
 # VisitorLog Admin
 @admin.register(VisitorLog)
 class VisitorLogAdmin(admin.ModelAdmin):
