@@ -1,6 +1,6 @@
 {% extends "tracker/base.html" %}
 {% load static %}
-{% load widget_tweaks %}
+
 
 {% block content %}
 <div class="container py-5">
@@ -25,24 +25,19 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
-                {{ form.display_name|add_class:"form-control" }}
             </div>
             <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
-                {{ form.city|add_class:"form-control" }}
             </div>
             <div class="col-md-6">
                 <label for="id_state" class="form-label">State</label>
-                {{ form.state|add_class:"form-control" }}
             </div>
             <div class="col-12">
                 <label for="id_message" class="form-label">Message</label>
-                {{ form.message|add_class:"form-control" }}
             </div>
 
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.show_location|add_class:"form-check-input" }}
                     <label class="form-check-label" for="id_show_location">
                         ✅ Show my location on the Memory Map
                     </label>
