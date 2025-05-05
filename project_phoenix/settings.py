@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tracker',
+    'jazzmin',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,26 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+JAZZMIN_SETTINGS = {
+    "site_title": "My Custom Admin",
+    "site_header": "My Admin Portal",
+    "site_brand": "MyBrand",
+    "welcome_sign": "Welcome to My Admin",
+    "copyright": "My Company ©",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "custom_links": {
+        "Patient": [{
+            "name": "View on Website",
+            "url": "https://4josh.org,
+            "icon": "fas fa-external-link-alt",
+            "permissions": ["auth.view_user"]
+        }]
+    },
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+    },
+}
