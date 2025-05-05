@@ -61,7 +61,7 @@ ROOT_URLCONF = 'project_phoenix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'tracker/templates'],  # <-- Add this line
+        'DIRS': [BASE_DIR / 'tracker/templates/tracker'],  # <-- Add this line
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
