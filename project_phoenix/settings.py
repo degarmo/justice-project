@@ -159,7 +159,7 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "Patient": [{
             "name": "View on Website",
-            "url": "https://4josh.org,
+            "url": "https://4josh.org",
             "icon": "fas fa-external-link-alt",
             "permissions": ["auth.view_user"]
         }]
