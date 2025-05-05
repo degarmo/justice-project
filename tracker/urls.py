@@ -15,6 +15,7 @@ urlpatterns = [
     # Blog URLs
     path('blog/', views.blog_list, name='blog_list'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    path('memorial/', views.memorial_page, name='memorial_page'),
 ]
 
 # Serve media files during development (only when DEBUG = True)

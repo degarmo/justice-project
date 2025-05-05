@@ -229,4 +229,23 @@ def index(request):
         'latest_post': latest_post
     })
 
+# Memorial
+from django.shortcuts import render, redirect
+from .models import MessageOfLove
+from .forms import MessageOfLoveForm
+
+def memorial_page(request):
+    if request.method == 'POST':
+        form = MessageOfLoveForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            if not request.user.is_anonymous and hasattr(request.user, 'visitorprofile'):
+                message.visitor = request.user.visitorprofile
+            message.save()
+            return redirect('memorial_page')
+    else:
+        form = MessageOfLoveForm()
+
+    messages = MessageOfLove.objects.order_by('-created_at')
+    return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 

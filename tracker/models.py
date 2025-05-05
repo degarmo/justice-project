@@ -71,5 +71,16 @@ class BlogPost(models.Model):
         return self.title
 
 
+# Message Of Love
+class MessageOfLove(models.Model):
+    visitor = models.ForeignKey('VisitorProfile', on_delete=models.CASCADE)
+    display_name = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    message = models.TextField()
+    is_anonymous = models.BooleanField(default=False)
+    show_location = models.BooleanField(default=False)
+    shared_social = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 

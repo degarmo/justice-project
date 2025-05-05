@@ -6,4 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tracker.urls')),
     path('log-behavior/', views.log_behavior, name='log_behavior'), 
+    # urls.py
+    path('memorial/', views.memorial_page, name='memorial_page'),
 ]
