@@ -2,14 +2,15 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers import serialize
-from .models import VisitorLog, TipSubmission, BehavioralLog
-from .forms import TipSubmissionForm
+from .models import VisitorLog, TipSubmission, BehavioralLog, MessageOfLove
+from .forms import TipSubmissionForm, MessageOfLoveForm
 import json
 import json, requests
 import requests
-# views.py
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
+
+
 
 
 def get_ip_data(ip):
@@ -229,10 +230,6 @@ def index(request):
         'latest_post': latest_post
     })
 
-# Memorial
-from django.shortcuts import render, redirect
-from .models import MessageOfLove
-from .forms import MessageOfLoveForm
 
 def memorial_page(request):
     if request.method == 'POST':
