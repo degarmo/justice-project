@@ -1,34 +1,108 @@
-{% extends "base.html" %}
+{% extends "tracker/base.html" %}
 {% load static %}
-{% include 'tracker/partials/navbar.html' %}
+
 {% block content %}
 <div class="container py-5">
-    <h1 class="mb-4">In Loving Memory</h1>
 
-    <form method="POST">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">Honor Joshua Terry’s Memory</h1>
+        <p class="lead">
+            We invite you to share a message of love, respect, or support for Josh’s family.
+            Whether you knew him personally or were moved by his story, your words matter.
+        </p>
+    </div>
+
+    <!-- Location Prompt Section -->
+    <div class="bg-light p-4 rounded mb-4">
+        <h4>Where were you when you heard his story?</h4>
+        <p>
+            By sharing your location, you help Josh’s family see how far his memory has reached.
+            It creates a map of love, strength, and solidarity from across the country.
+        </p>
+        <p class="text-muted small">
+            📍 Your precise location is only shared if you choose to allow it.
+            If not, feel free to share your city and state manually.
+        </p>
+    </div>
+
+    <!-- Form Section -->
+    <form method="POST" class="needs-validation" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Leave a Message</button>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="id_display_name" class="form-label">Your Name</label>
+                {{ form.display_name }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_city" class="form-label">City</label>
+                {{ form.city }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_state" class="form-label">State</label>
+                {{ form.state }}
+            </div>
+            <div class="col-12">
+                <label for="id_message" class="form-label">Message</label>
+                {{ form.message }}
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    {{ form.show_location }}
+                    <label class="form-check-label" for="id_show_location">
+                        ✅ Yes, show my location on the Memory Map
+                        <br><small class="text-muted">(You’ll be prompted to approve this in your browser.)</small>
+                    </label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    {{ form.is_anonymous }}
+                    <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    {{ form.shared_social }}
+                    <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <p class="small text-muted mt-2">
+                    We do not store or share your personal details without your consent.
+                    Your name and location will appear only if you allow it,
+                    and only for the purpose of honoring Josh’s life.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Leave a Message</button>
+        </div>
     </form>
 
-    <hr class="my-4">
+    <hr class="my-5">
 
-    <h3>Messages from the Community</h3>
+    <!-- Messages Section -->
+    <h3 class="mb-4">Messages from the Community</h3>
     {% for msg in messages %}
-        <div class="border p-3 mb-3">
-            <strong>
+        <div class="border rounded p-4 mb-3">
+            <h5>
                 {% if msg.is_anonymous %}Anonymous{% else %}{{ msg.display_name }}{% endif %}
-            </strong>
-            {% if msg.show_location %}
-                <small>from {{ msg.city }}, {{ msg.state }}</small>
-            {% endif %}
-            <p>{{ msg.message }}</p>
+                {% if msg.show_location %}
+                    <small class="text-muted">from {{ msg.city }}, {{ msg.state }}</small>
+                {% endif %}
+            </h5>
+            <p class="mb-1">{{ msg.message }}</p>
             <small class="text-muted">{{ msg.created_at|date:"F j, Y, g:i a" }}</small>
         </div>
     {% empty %}
-        <p>No messages yet.</p>
+        <p>No messages yet. Be the first to share one.</p>
     {% endfor %}
+
 </div>
-{% include 'tracker/partials/footer.html' %}
+{% endblock %}
+
+{% block scripts %}
 <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
 {% endblock %}
