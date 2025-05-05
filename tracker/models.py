@@ -73,7 +73,7 @@ class BlogPost(models.Model):
 
 # Message Of Love
 class MessageOfLove(models.Model):
-    visitor = models.ForeignKey('VisitorProfile', on_delete=models.CASCADE)
+    visitor = models.ForeignKey('VisitorLog', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
