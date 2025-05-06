@@ -253,7 +253,7 @@ def memorial_page(request):
         form = MessageOfLoveForm()
 
     messages = MessageOfLove.objects.all().order_by('-created_at')
-    return render(request, 'tracker/memorial.html', {'form': form, 'messages': messages})
+    return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 
 
 
