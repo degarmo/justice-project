@@ -1,7 +1,6 @@
 {% extends "tracker/base.html" %}
 {% load static %}
 
-
 {% block content %}
 <div class="container py-5">
 
@@ -20,24 +19,29 @@
     </div>
 
     <!-- Form -->
-    <form method="POST" class="needs-validation" novalidate>
+    <form method="POST" novalidate>
         {% csrf_token %}
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
+                {{ form.display_name }}
             </div>
             <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
+                {{ form.city }}
             </div>
             <div class="col-md-6">
                 <label for="id_state" class="form-label">State</label>
+                {{ form.state }}
             </div>
             <div class="col-12">
                 <label for="id_message" class="form-label">Message</label>
+                {{ form.message }}
             </div>
 
             <div class="col-12">
                 <div class="form-check">
+                    {{ form.show_location }}
                     <label class="form-check-label" for="id_show_location">
                         ✅ Show my location on the Memory Map
                     </label>
@@ -46,14 +50,14 @@
 
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.is_anonymous|add_class:"form-check-input" }}
+                    {{ form.is_anonymous }}
                     <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
                 </div>
             </div>
 
             <div class="col-12">
                 <div class="form-check">
-                    {{ form.shared_social|add_class:"form-check-input" }}
+                    {{ form.shared_social }}
                     <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
                 </div>
             </div>
