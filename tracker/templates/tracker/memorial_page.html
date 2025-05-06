@@ -21,20 +21,20 @@
     <!-- Form -->
     <form method="POST" novalidate>
         {% csrf_token %}
-        <div class="row g-3">
+        <div class="row g-3 form-group">
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
                 {{ form.display_name }}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 form-group">
                 <label for="id_city" class="form-label">City</label>
                 {{ form.city }}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 form-group">
                 <label for="id_state" class="form-label">State</label>
                 {{ form.state }}
             </div>
-            <div class="col-12">
+            <div class="col-12 form-group">
                 <label for="id_message" class="form-label">Message</label>
                 {{ form.message }}
             </div>
@@ -42,7 +42,7 @@
             <div class="col-12">
                 <div class="form-check">
                     {{ form.show_location }}
-                    <label class="form-check-label" for="id_show_location">
+                    <label class="checkbox" for="id_show_location id_shared_social" checked data-toggle="toggle" >
                         ✅ Show my location on the Memory Map
                     </label>
                 </div>
@@ -51,20 +51,20 @@
             <div class="col-12">
                 <div class="form-check">
                     {{ form.is_anonymous }}
-                    <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
+                    <label class="checkbox" for="id_is_anonymous id_shared_social" >Stay Anonymous</label>
                 </div>
             </div>
 
             <div class="col-12">
                 <div class="form-check">
                     {{ form.shared_social }}
-                    <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
+                    <label class="checkbox" for="id_shared_social">I shared this on social media</label>
                 </div>
             </div>
 
             <div class="col-12">
                 <p class="text-muted small mt-2">
-                    We do not store or share your personal details without your consent.
+                    We do not share your personal details without your consent.
                 </p>
             </div>
         </div>
