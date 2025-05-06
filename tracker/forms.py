@@ -13,7 +13,12 @@ class TipSubmissionForm(forms.ModelForm):
 class MessageOfLoveForm(forms.ModelForm):
     class Meta:
         model = MessageOfLove
-        fields = ['display_name', 'city', 'state', 'message', 'is_anonymous', 'show_location', 'shared_social']
+        fields = ['display_name', 'city', 'state', 'message', 'is_anonymous', 'show_location']
         widgets = {
-            'message': forms.Textarea(attrs={'rows': 4}),
+            'display_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Name'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}),
+            'state': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'State'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Your message...'}),
+            'is_anonymous': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'show_location': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
