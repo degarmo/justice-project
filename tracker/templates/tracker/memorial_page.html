@@ -64,14 +64,6 @@
                 </div>
             </div>
     
-            <!-- Shared Social -->
-            <div class="col-12">
-                <div class="form-check">
-                    {{ form.shared_social }}
-                    <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
-                </div>
-            </div>
-    
             <!-- Note -->
             <div class="col-12">
                 <p class="text-muted small">We do not share your personal details without your consent.</p>
@@ -109,31 +101,4 @@
 
 {% block scripts %}
 <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
-<script>
-function fillCityStateFromCoords(lat, lon) {
-    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-                document.getElementById('id_city').value = data.city || '';
-                document.getElementById('id_state').value = data.principalSubdivision || '';
-            }
-        })
-        .catch(err => {
-            console.warn("Location lookup failed:", err);
-        });
-}
-
-document.getElementById('getLocationBtn').addEventListener('click', function () {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            fillCityStateFromCoords(position.coords.latitude, position.coords.longitude);
-        }, function (error) {
-            alert("Unable to access location: " + error.message);
-        });
-    } else {
-        alert("Geolocation is not supported by your browser.");
-    }
-});
-</script>
 {% endblock %}
