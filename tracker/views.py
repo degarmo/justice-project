@@ -260,3 +260,25 @@ def memorial_page(request):
 def confirm_message_log(request):
     messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
     return render(request, 'tracker/confirm_data.html', {'messages': messages})
+
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
+def memory_map(request):
+    messages = MessageOfLove.objects.filter(show_location=True)
+    messages_json = json.dumps([
+        {
+            'display_name': msg.display_name,
+            'city': msg.city,
+            'state': msg.state,
+            'message': msg.message,
+            'latitude': msg.latitude,
+            'longitude': msg.longitude,
+            'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M')
+        } for msg in messages
+    ], cls=DjangoJSONEncoder)
+
+    return render(request, 'tracker/memory_map.html', {
+        'messages': messages,
+        'messages_json': messages_json
+    })

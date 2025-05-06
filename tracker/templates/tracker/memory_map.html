@@ -1,0 +1,62 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-0">
+        <!-- Left: Map -->
+        <div class="col-md-10" style="height: 100vh;">
+            <div id="map" style="height: 100%; width: 100%;"></div>
+        </div>
+
+        <!-- Right: Scrollable Message Feed -->
+        <div class="col-md-2 bg-light border-start overflow-auto" style="height: 100vh;">
+            <h5 class="p-3 border-bottom">Messages</h5>
+            <div id="messages" class="p-3">
+                {% for msg in messages %}
+                    <div class="mb-4">
+                        <strong>{% if msg.is_anonymous %}Anonymous{% else %}{{ msg.display_name }}{% endif %}</strong><br>
+                        {% if msg.show_location %}
+                            <small>{{ msg.city }}, {{ msg.state }}</small><br>
+                        {% endif %}
+                        <span>{{ msg.message }}</span><br>
+                        <small class="text-muted">{{ msg.created_at|date:"M j, Y" }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE"></script>
+<script>
+    function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 4,
+            center: { lat: 39.8283, lng: -98.5795 }, // center of USA
+        });
+
+        const messages = {{ messages_json|safe }};
+        messages.forEach(msg => {
+            if (msg.latitude && msg.longitude) {
+                const marker = new google.maps.Marker({
+                    position: { lat: msg.latitude, lng: msg.longitude },
+                    map: map,
+                    title: msg.display_name || "Anonymous",
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<strong>${msg.display_name || 'Anonymous'}</strong><br>${msg.message}`,
+                });
+
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+            }
+        });
+    }
+
+    window.onload = initMap;
+</script>
+{% endblock %}
