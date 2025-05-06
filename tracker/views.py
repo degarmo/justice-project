@@ -246,3 +246,9 @@ def memorial_page(request):
     messages = MessageOfLove.objects.order_by('-created_at')
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 
+from django.shortcuts import render
+from .models import MessageOfLove
+
+def confirm_message_log(request):
+    messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
+    return render(request, 'tracker/confirm_data.html', {'messages': messages})

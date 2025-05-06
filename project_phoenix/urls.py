@@ -8,4 +8,5 @@ urlpatterns = [
     path('log-behavior/', views.log_behavior, name='log_behavior'), 
     # urls.py
     path('memorial/', views.memorial_page, name='memorial_page'),
+    path('debug/messages/', views.confirm_message_log, name='confirm_message_log'),
 ]

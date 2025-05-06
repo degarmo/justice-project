@@ -16,6 +16,7 @@ urlpatterns = [
     path('blog/', views.blog_list, name='blog_list'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     path('memorial/', views.memorial_page, name='memorial_page'),
+    path('debug/messages/', views.confirm_message_log, name='confirm_message_log'),
 ]
 
 # Serve media files during development (only when DEBUG = True)

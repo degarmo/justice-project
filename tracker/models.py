@@ -71,7 +71,6 @@ class BlogPost(models.Model):
         return self.title
 
 
-# Message Of Love
 class MessageOfLove(models.Model):
     visitor = models.ForeignKey('VisitorLog', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=100, blank=True)
@@ -80,7 +79,7 @@ class MessageOfLove(models.Model):
     message = models.TextField()
     is_anonymous = models.BooleanField(default=False)
     show_location = models.BooleanField(default=False)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Message by {self.display_name or 'Anonymous'}"
