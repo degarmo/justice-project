@@ -18,62 +18,72 @@
         <p class="small text-muted">You’ll be asked to approve location access. Or, enter city/state manually.</p>
     </div>
 
-    <!-- Form -->
     <form method="POST" novalidate>
         {% csrf_token %}
-        <div class="row g-3 form-group">
+        <div class="row g-4">
+    
+            <!-- Name -->
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
                 {{ form.display_name }}
             </div>
-            <div class="col-md-6 form-group">
+    
+            <!-- City -->
+            <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
                 {{ form.city }}
             </div>
-            <div class="col-md-6 form-group">
+    
+            <!-- State -->
+            <div class="col-md-6">
                 <label for="id_state" class="form-label">State</label>
                 {{ form.state }}
             </div>
-            <div class="col-12 form-group">
+    
+            <!-- Message -->
+            <div class="col-12">
                 <label for="id_message" class="form-label">Message</label>
                 {{ form.message }}
             </div>
-
+    
+            <!-- Show location -->
             <div class="col-12">
                 <div class="form-check">
                     {{ form.show_location }}
-                    <label class="checkbox" for="id_show_location id_shared_social" checked data-toggle="toggle" >
+                    <label class="form-check-label" for="id_show_location">
                         ✅ Show my location on the Memory Map
                     </label>
                 </div>
             </div>
-
+    
+            <!-- Stay Anonymous -->
             <div class="col-12">
                 <div class="form-check">
                     {{ form.is_anonymous }}
-                    <label class="checkbox" for="id_is_anonymous id_shared_social" >Stay Anonymous</label>
+                    <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
                 </div>
             </div>
-
+    
+            <!-- Shared Social -->
             <div class="col-12">
                 <div class="form-check">
                     {{ form.shared_social }}
-                    <label class="checkbox" for="id_shared_social">I shared this on social media</label>
+                    <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
                 </div>
             </div>
-
+    
+            <!-- Note -->
             <div class="col-12">
-                <p class="text-muted small mt-2">
-                    We do not share your personal details without your consent.
-                </p>
+                <p class="text-muted small">We do not share your personal details without your consent.</p>
+            </div>
+    
+            <!-- Submit Button -->
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-lg w-100">📨 Leave a Message</button>
             </div>
         </div>
-
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary btn-lg w-100">📨 Leave a Message</button>
-        </div>
     </form>
-
+    
     <!-- Community Messages -->
     <hr class="my-5">
     <h3 class="mb-4">Messages from the Community</h3>
