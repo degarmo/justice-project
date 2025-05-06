@@ -17,7 +17,6 @@
         <button id="getLocationBtn" class="btn btn-outline-primary btn-sm mb-2">📍 Get My Location</button>
         <p class="small text-muted">You’ll be asked to approve location access. Or, enter city/state manually.</p>
     </div>
-
     <form method="POST" novalidate>
         {% csrf_token %}
         <div class="row g-4">
@@ -25,50 +24,44 @@
             <!-- Name -->
             <div class="col-md-6">
                 <label for="id_display_name" class="form-label">Your Name</label>
-                {{ form.display_name }}
+                {{ form.display_name|add_class:"form-control" }}
             </div>
     
             <!-- City -->
             <div class="col-md-6">
                 <label for="id_city" class="form-label">City</label>
-                {{ form.city }}
+                {{ form.city|add_class:"form-control" }}
             </div>
     
             <!-- State -->
             <div class="col-md-6">
                 <label for="id_state" class="form-label">State</label>
-                {{ form.state }}
+                {{ form.state|add_class:"form-control" }}
             </div>
     
             <!-- Message -->
             <div class="col-12">
                 <label for="id_message" class="form-label">Message</label>
-                {{ form.message }}
+                {{ form.message|add_class:"form-control" }}
             </div>
     
-            <!-- Show location -->
+            <!-- Stacked Checkboxes -->
             <div class="col-12">
-                <div class="form-check">
-                    {{ form.show_location }}
-                    <label class="form-check-label" for="id_show_location">
-                        ✅ Show my location on the Memory Map
-                    </label>
-                </div>
-            </div>
-    
-            <!-- Stay Anonymous -->
-            <div class="col-12">
-                <div class="form-check">
-                    {{ form.is_anonymous }}
-                    <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
-                </div>
-            </div>
-    
-            <!-- Shared Social -->
-            <div class="col-12">
-                <div class="form-check">
-                    {{ form.shared_social }}
-                    <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
+                <div class="card p-3">
+                    <div class="form-check mb-2">
+                        {{ form.show_location|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="id_show_location">
+                            ✅ Show my location on the Memory Map
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        {{ form.is_anonymous|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="id_is_anonymous">Stay Anonymous</label>
+                    </div>
+                    <div class="form-check">
+                        {{ form.shared_social|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="id_shared_social">I shared this on social media</label>
+                    </div>
                 </div>
             </div>
     
@@ -83,6 +76,7 @@
             </div>
         </div>
     </form>
+    
     
     <!-- Community Messages -->
     <hr class="my-5">
