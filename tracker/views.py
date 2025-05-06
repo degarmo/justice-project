@@ -8,8 +8,7 @@ import json
 import json, requests
 import requests
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
-
+from .models import MessageOfLove
 
 
 
@@ -232,22 +231,31 @@ def index(request):
 
 
 def memorial_page(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = MessageOfLoveForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
-            if not request.user.is_anonymous and hasattr(request.user, 'visitorprofile'):
-                message.visitor = request.user.visitorprofile
+
+            # ⬇️ Get or create visitor based on IP
+            ip = get_client_ip(request)
+            visitor = VisitorLog.objects.filter(ip_address=ip).first()
+
+            if visitor:
+                message.visitor = visitor
+            else:
+                # fallback (optional): create a blank visitor if needed
+                visitor = VisitorLog.objects.create(ip_address=ip)
+                message.visitor = visitor
+
             message.save()
             return redirect('memorial_page')
     else:
         form = MessageOfLoveForm()
 
-    messages = MessageOfLove.objects.order_by('-created_at')
-    return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
+    messages = MessageOfLove.objects.all().order_by('-created_at')
+    return render(request, 'tracker/memorial.html', {'form': form, 'messages': messages})
 
-from django.shortcuts import render
-from .models import MessageOfLove
+
 
 def confirm_message_log(request):
     messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
