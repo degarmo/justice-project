@@ -278,8 +278,9 @@ def memory_map(request):
             'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M')
         } for msg in messages
     ], cls=DjangoJSONEncoder)
-
+    
     return render(request, 'tracker/memory_map.html', {
         'messages': messages,
         'messages_json': messages_json
     })
+

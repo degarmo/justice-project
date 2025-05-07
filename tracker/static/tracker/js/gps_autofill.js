@@ -20,3 +20,26 @@ document.getElementById('share-location').addEventListener('change', function() 
     }
 });
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById('getLocationBtn');
+    if (btn) {
+        btn.addEventListener('click', function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        document.getElementById('id_latitude').value = position.coords.latitude;
+                        document.getElementById('id_longitude').value = position.coords.longitude;
+                        console.log("✅ Location captured");
+                    },
+                    function (error) {
+                        alert("❌ Error getting location: " + error.message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        });
+    }
+});
+</script>

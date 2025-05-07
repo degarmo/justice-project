@@ -20,6 +20,9 @@
 
     <form method="POST" novalidate>
         {% csrf_token %}
+                <!-- Hidden GPS Fields -->
+        <input type="hidden" name="latitude" id="id_latitude">
+        <input type="hidden" name="longitude" id="id_longitude">
         <div class="row g-4">
     
             <!-- Name -->
