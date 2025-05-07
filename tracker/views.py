@@ -9,7 +9,6 @@ import json, requests
 import requests
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import MessageOfLove
-from .utils import geocode_city_state
 from tracker.utils.ai_analysis import analyze_behavior
 
 
