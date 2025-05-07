@@ -2,24 +2,24 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid px-0">
+<div class="container-fluid px-0" style="padding: 3rem;">
     <div class="row g-0">
         <!-- Google Map: 70% -->
-        <div class="col-md-8" style="height: 100vh;">
+        <div class="col-md-8" style="height: 95vh;">
             <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
 
         <!-- Messages Panel: 30% -->
-        <div class="col-md-4 bg-light p-4 " style="height: 100vh; overflow-y: scroll;">
-            <h4 class="mb-4 card">Messages of Love</h4>
+        <div class="col-md-4 bg-light p-4 " style="height: 95vh; overflow-y: scroll;">
+            <h4 class="mb-4">Messages of Love</h4>
             {% for msg in messages %}
-                <div class="mb-3 card-body">
+                <div class="mb-3">
                     <strong>{% if msg.is_anonymous %}Anonymous{% else %}{{ msg.display_name }}{% endif %}</strong>
                     {% if msg.show_location %}
-                        <small class="text-muted card-subtitle">from {{ msg.city }}, {{ msg.state }}</small>
+                        <small class="text-muted">from {{ msg.city }}, {{ msg.state }}</small>
                     {% endif %}
                     <p class="mb-1">{{ msg.message }}</p>
-                    <small class="text-muted card-text">{{ msg.created_at|date:"F j, Y, g:i a" }}</small>
+                    <small class="text-muted">{{ msg.created_at|date:"F j, Y, g:i a" }}</small>
                     <hr>
                 </div>
             {% empty %}
