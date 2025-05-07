@@ -36,24 +36,28 @@
 
 <script>
     function initMap() {
-        const center = { lat: 39.5, lng: -98.35 }; // US center
-        const map = new google.maps.Map(document.getElementById("map"), {
+        const map = new google.maps.Map(document.getElementById('map'), {
             zoom: 4,
-            center: center,
+            center: { lat: 39.5, lng: -98.35 }  // USA center
         });
-
-        const messages = {{ messages_json|safe }};
-        messages.forEach(msg => {
-            if (msg.latitude && msg.longitude) {
+    
+        const locations = {{ messages_json|safe }};
+    
+        locations.forEach(loc => {
+            if (loc.latitude && loc.longitude) {
                 new google.maps.Marker({
-                    position: { lat: msg.latitude, lng: msg.longitude },
+                    position: { lat: loc.latitude, lng: loc.longitude },
                     map: map,
-                    title: msg.display_name || "Anonymous"
+                    title: loc.display_name || "Anonymous"
                 });
             }
         });
     }
+    </script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE&callback=initMap">
+    </script>
+    
 
-    window.onload = initMap;
 </script>
 {% endblock %}
