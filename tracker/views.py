@@ -266,7 +266,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 def memory_map(request):
-    messages = MessageOfLove.objects.filter(show_location=True)
+    messages = MessageOfLove.objects.filter(show_location=True, latitude__isnull=False, longitude__isnull=False)
     messages_json = json.dumps([
         {
             'display_name': msg.display_name,
