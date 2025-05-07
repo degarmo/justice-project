@@ -20,9 +20,8 @@
 
     <form method="POST" novalidate>
         {% csrf_token %}
-                <!-- Hidden GPS Fields -->
         <input type="hidden" name="latitude" id="id_latitude">
-        <input type="hidden" name="longitude" id="id_longitude">
+        <input type="hidden" name="longitude" id="id_longitude">        
         <div class="row g-4">
     
             <!-- Name -->
@@ -97,7 +96,7 @@
     {% empty %}
         <p>No messages yet. Be the first to share one.</p>
     {% endfor %}
-    return redirect('memory_map')
+
 </div>
 {% endblock %}
 {% block scripts %}
@@ -109,8 +108,12 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function (position) {
-                        document.getElementById("id_latitude").value = position.coords.latitude;
-                        document.getElementById("id_longitude").value = position.coords.longitude;
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        console.log("Got location:", lat, lon);  // ✅ Debug
+    
+                        document.getElementById("id_latitude").value = lat;
+                        document.getElementById("id_longitude").value = lon;
                     },
                     function (error) {
                         alert("Error getting location: " + error.message);
@@ -121,6 +124,5 @@
             }
         });
     });
-    </script>
-    
+    </script>    
 {% endblock %}

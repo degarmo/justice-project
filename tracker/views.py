@@ -249,7 +249,7 @@ def memorial_page(request):
                 message.visitor = visitor
 
             message.save()
-            return redirect('memorial_page')
+            return redirect('memory_map')
     else:
         form = MessageOfLoveForm()
 
