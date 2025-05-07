@@ -1,5 +1,4 @@
 from datetime import timedelta
-from tracker.utils.ai_analysis import analyze_behavior
 
 
 def analyze_behavior(visitor, behaviors):
