@@ -9,7 +9,7 @@ import json, requests
 import requests
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import MessageOfLove
-
+from .utils import geocode_city_state
 
 
 def get_ip_data(ip):
