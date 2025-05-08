@@ -4,13 +4,13 @@
 {% block content %}
 <div class="container-fluid px-0" style="padding-top: 5rem;">
     <div class="row g-0">
-        <!-- Google Map: 70% -->
+        <!-- Google Map (70%) -->
         <div class="col-md-8" style="height: 80vh;">
             <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
 
-        <!-- Messages Panel: 30% -->
-        <div class="col-md-4 bg-light p-4 " style="height: 80vh; overflow-y: scroll;">
+        <!-- Messages Panel (30%) -->
+        <div class="col-md-4 bg-light p-4" style="height: 80vh; overflow-y: auto;">
             <h4 class="mb-4">Messages of Love</h4>
             {% for msg in messages %}
                 <div class="mb-3">
@@ -23,7 +23,7 @@
                     <hr>
                 </div>
             {% empty %}
-                <p>Be the first to leave a message.</p>
+                <p>No messages yet.</p>
             {% endfor %}
         </div>
     </div>
@@ -32,33 +32,30 @@
 
 {% block scripts %}
 <script>
-    function initMap() {
-      const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 4,
-        center: { lat: 39.5, lng: -98.35 }
-      });
-  
-      const locations = {{ messages_json|safe }};
-  
-      console.log("Loaded locations:", locations);  // Debug output
-  
-      locations.forEach(loc => {
-        if (loc.latitude && loc.longitude) {
-          new google.maps.Marker({
-            position: { lat: loc.latitude, lng: loc.longitude },
-            map: map,
-            title: loc.display_name || "Anonymous"
-          });
-        }
-      });
-    }
-  
-    // Ensure map loads on page render
-    window.initMap = initMap;
-  </script>
-<!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE"></script>
+  function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 4,
+      center: { lat: 39.5, lng: -98.35 }
+    });
 
-    <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
+    const markers = {{ messages_json|safe }};
 
+    markers.forEach((msg) => {
+      if (msg.latitude && msg.longitude) {
+        new google.maps.Marker({
+          position: { lat: msg.latitude, lng: msg.longitude },
+          map: map,
+          title: msg.display_name || "Anonymous"
+        });
+      }
+    });
+  }
+
+  window.initMap = initMap;
+</script>
+
+<!-- Google Maps API (async & callback to initMap) -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE&callback=initMap">
+</script>
 {% endblock %}
