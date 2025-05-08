@@ -121,13 +121,6 @@ def tip_submissions_api(request):
     return JsonResponse(data, safe=False)
 
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
 
 
 @csrf_exempt
@@ -251,18 +244,18 @@ def memorial_page(request):
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 
 
-def get_current_visitor(request):
-    ip = get_client_ip(request)
-    visitor, created = VisitorLog.objects.get_or_create(ip_address=ip)
-    return visitor
-
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
+        ip = x_forwarded_for.split(',')[0]
     else:
         ip = request.META.get("REMOTE_ADDR")
     return ip
+
+def get_current_visitor(request):
+    ip = get_client_ip(request)
+    visitor, _ = VisitorLog.objects.get_or_create(ip_address=ip)
+    return visitor
 
 def confirm_message_log(request):
     messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
