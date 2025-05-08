@@ -234,12 +234,15 @@ def memorial_page(request):
         form = MessageOfLoveForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
-            message.visitor = get_current_visitor(request)  # You need to define this function
+            ip = get_client_ip(request)  # or however you’re getting IP
+            visitor = VisitorLog.objects.filter(ip_address=ip).first()
+            if not visitor:
+                visitor = VisitorLog.objects.create(ip_address=ip)
+            message.visitor = visitor
             message.save()
-            return redirect('memory_map')  # Make sure your URL name is correct
+            return redirect('memory_map')  # URL name must match in urls.py
     else:
         form = MessageOfLoveForm()
-    return render(request, 'tracker/memorial_page.html', {'form': form})
 
     messages = MessageOfLove.objects.all().order_by('-created_at')
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
