@@ -33,27 +33,9 @@
 {% block scripts %}
 <!-- Google Maps API -->
 <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE"></script>-->
-<script>
-    function initMap() {
-        const map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
-            center: { lat: 39.5, lng: -98.35 }  // USA center
-        });
-    
-        const locations = {{ messages_json|safe }};
-    
-        locations.forEach(loc => {
-            if (loc.latitude && loc.longitude) {
-                new google.maps.Marker({
-                    position: { lat: loc.latitude, lng: loc.longitude },
-                    map: map,
-                    title: loc.display_name || "Anonymous"
-                });
-            }
-        });
-    }
-    </script>
-    <script async defer
+
+    <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
+    <script>
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE&callback=initMap">
     </script>
 {% endblock %}

@@ -54,6 +54,7 @@
                     {{ form.show_location }}
                     <label class="form-check-label" for="id_show_location">
                         ✅ Show my location on the Memory Map
+                    </label> 
                 </div>
             </div>
     
@@ -100,29 +101,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btn = document.getElementById("getLocationBtn");
-        btn.addEventListener("click", function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        console.log("Got location:", lat, lon);  // ✅ Debug
-    
-                        document.getElementById("id_latitude").value = lat;
-                        document.getElementById("id_longitude").value = lon;
-                    },
-                    function (error) {
-                        alert("Error getting location: " + error.message);
-                    }
-                );
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        });
-    });
-    </script>    
+    <script src="{% static 'tracker/js/gps_autofill.js' %}"></script>
 {% endblock %}

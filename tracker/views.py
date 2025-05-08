@@ -231,27 +231,19 @@ def index(request):
     })
 
 
+from django.shortcuts import redirect
+
 def memorial_page(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = MessageOfLoveForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
-
-            # ⬇️ Get or create visitor based on IP
-            ip = get_client_ip(request)
-            visitor = VisitorLog.objects.filter(ip_address=ip).first()
-
-            if visitor:
-                message.visitor = visitor
-            else:
-                # fallback (optional): create a blank visitor if needed
-                visitor = VisitorLog.objects.create(ip_address=ip)
-                message.visitor = visitor
-
+            message.visitor = get_current_visitor(request)  # You need to define this function
             message.save()
-            return redirect('memory_map')
+            return redirect('memory_map')  # Make sure your URL name is correct
     else:
         form = MessageOfLoveForm()
+    return render(request, 'tracker/memorial.html', {'form': form})
 
     messages = MessageOfLove.objects.all().order_by('-created_at')
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
