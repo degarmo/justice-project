@@ -266,7 +266,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 def memory_map(request):
-    messages = MessageOfLove.objects.filter(show_location=True, latitude__isnull=False, longitude__isnull=False)
+    messages = MessageOfLove.objects.filter(show_location=True).exclude(latitude__isnull=True, longitude__isnull=True)
     messages_json = json.dumps([
         {
             'display_name': msg.display_name,
@@ -278,9 +278,10 @@ def memory_map(request):
             'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M')
         } for msg in messages
     ], cls=DjangoJSONEncoder)
-    
+
     return render(request, 'tracker/memory_map.html', {
         'messages': messages,
         'messages_json': messages_json
     })
+
 
