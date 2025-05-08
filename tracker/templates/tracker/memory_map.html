@@ -31,6 +31,31 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 4,
+        center: { lat: 39.5, lng: -98.35 }
+      });
+  
+      const locations = {{ messages_json|safe }};
+  
+      console.log("Loaded locations:", locations);  // Debug output
+  
+      locations.forEach(loc => {
+        if (loc.latitude && loc.longitude) {
+          new google.maps.Marker({
+            position: { lat: loc.latitude, lng: loc.longitude },
+            map: map,
+            title: loc.display_name || "Anonymous"
+          });
+        }
+      });
+    }
+  
+    // Ensure map loads on page render
+    window.initMap = initMap;
+  </script>
 <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtjZE5pRf_kM-P3l2mDTItjg9KgA7RgDE"></script>
 
