@@ -11,6 +11,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .models import MessageOfLove
 from tracker.utils.ai_analysis import analyze_behavior
 from django.shortcuts import redirect
+from tracker.models import VisitorLog
 
 
 def get_ip_data(ip):
@@ -249,6 +250,18 @@ def memorial_page(request):
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 
 
+def get_current_visitor(request):
+    ip = get_client_ip(request)
+    visitor, created = VisitorLog.objects.get_or_create(ip_address=ip)
+    return visitor
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
 
 def confirm_message_log(request):
     messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
