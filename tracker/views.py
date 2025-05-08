@@ -15,6 +15,7 @@ from tracker.models import VisitorLog
 from tracker.utils import get_current_visitor
 
 
+
 def get_ip_data(ip):
     try:
         response = requests.get(f'https://ipapi.co/{ip}/json/')
