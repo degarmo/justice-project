@@ -12,6 +12,7 @@ from .models import MessageOfLove
 from tracker.utils.ai_analysis import analyze_behavior
 from django.shortcuts import redirect
 from tracker.models import VisitorLog
+from tracker.utils import get_current_visitor
 
 
 def get_ip_data(ip):
