@@ -10,7 +10,7 @@ import requests
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import MessageOfLove
 from tracker.utils.ai_analysis import analyze_behavior
-
+from django.shortcuts import redirect
 
 
 def get_ip_data(ip):
@@ -231,7 +231,7 @@ def index(request):
     })
 
 
-from django.shortcuts import redirect
+
 
 def memorial_page(request):
     if request.method == 'POST':
@@ -243,7 +243,7 @@ def memorial_page(request):
             return redirect('memory_map')  # Make sure your URL name is correct
     else:
         form = MessageOfLoveForm()
-    return render(request, 'tracker/memorial.html', {'form': form})
+    return render(request, 'tracker/memorial_page.html', {'form': form})
 
     messages = MessageOfLove.objects.all().order_by('-created_at')
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
