@@ -25,8 +25,8 @@ function fillCityStateFromCoords(lat, lon) {
         .then(data => {
             document.getElementById('id_city').value = data.city || '';
             document.getElementById('id_state').value = data.principalSubdivision || '';
-            document.getElementById('id_latitude').value = lat;
-            document.getElementById('id_longitude').value = lon;
+            document.getElementById('id_latitude').value = position.coords.latitude;
+            document.getElementById('id_longitude').value = position.coords.longitude;
         })
         .catch(err => console.warn("Failed to fetch geolocation data:", err));
 }
@@ -41,8 +41,8 @@ function fillCityStateFromCoords(lat, lon) {
                         const lon = position.coords.longitude;
                         console.log("Got location:", lat, lon);  // ✅ Debug
     
-                        document.getElementById("id_latitude").value = lat;
-                        document.getElementById("id_longitude").value = lon;
+                        document.getElementById('id_latitude').value = position.coords.latitude;
+                        document.getElementById('id_longitude').value = position.coords.longitude;
                     },
                     function (error) {
                         alert("Error getting location: " + error.message);
@@ -59,9 +59,6 @@ function initMap() {
         zoom: 4,
         center: { lat: 39.5, lng: -98.35 }  // USA center
     });
-
-    const locations = {{ messages_json|safe }};
-
     locations.forEach(loc => {
         if (loc.latitude && loc.longitude) {
             new google.maps.Marker({
