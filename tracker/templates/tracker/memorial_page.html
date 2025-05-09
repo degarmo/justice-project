@@ -21,7 +21,9 @@
     <form method="POST" novalidate>
         {% csrf_token %}
         <input type="hidden" name="latitude" id="id_latitude">
-        <input type="hidden" name="longitude" id="id_longitude">        
+        <input type="hidden" name="longitude" id="id_longitude">
+        <input type="text" name="city" id="id_city">
+        <input type="text" name="state" id="id_state">       
         <div class="row g-4">
     
             <!-- Name -->

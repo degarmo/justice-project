@@ -25,8 +25,8 @@ function fillCityStateFromCoords(lat, lon) {
         .then(data => {
             document.getElementById('id_city').value = data.city || '';
             document.getElementById('id_state').value = data.principalSubdivision || '';
-            document.getElementById('id_latitude').value = position.coords.latitude;
-            document.getElementById('id_longitude').value = position.coords.longitude;
+            document.getElementById('id_latitude').value = lat;
+            document.getElementById('id_longitude').value = lon;
         })
         .catch(err => console.warn("Failed to fetch geolocation data:", err));
 }
@@ -43,6 +43,7 @@ function fillCityStateFromCoords(lat, lon) {
     
                         document.getElementById('id_latitude').value = position.coords.latitude;
                         document.getElementById('id_longitude').value = position.coords.longitude;
+                        fillCityStateFromCoords(lat, lon);
                     },
                     function (error) {
                         alert("Error getting location: " + error.message);
