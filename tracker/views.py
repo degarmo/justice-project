@@ -13,7 +13,7 @@ from tracker.utils.ai_analysis import analyze_behavior
 from django.shortcuts import redirect
 from tracker.models import VisitorLog
 from tracker.utils import get_current_visitor
-
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 def get_ip_data(ip):
@@ -265,11 +265,10 @@ def confirm_message_log(request):
     messages = MessageOfLove.objects.all().order_by('-created_at')[:100]
     return render(request, 'tracker/confirm_data.html', {'messages': messages})
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
+
 
 def memory_map(request):
-    messages = MessageOfLove.objects.filter(show_location=True).exclude(latitude__isnull=True, longitude__isnull=True)
+    messages = MessageOfLove.objects.filter(show_location=True)
     messages_json = json.dumps([
         {
             'display_name': msg.display_name,
