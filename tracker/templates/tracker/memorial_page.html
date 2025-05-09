@@ -14,16 +14,15 @@
     <div class="alert alert-light border rounded p-4 mb-4">
         <h4>Where were you when you heard his story?</h4>
         <p>Share your location to help map the impact of Josh’s story.</p>
+        <input type="hidden" name="latitude" id="id_latitude">
+        <input type="hidden" name="longitude" id="id_longitude"> 
         <button id="getLocationBtn" class="btn btn-outline-primary btn-sm mb-2">📍 Get My Location</button>
         <p class="small text-muted">You’ll be asked to approve location access. Or, enter city/state manually.</p>
     </div>
 
     <form method="POST" novalidate>
         {% csrf_token %}
-        <input type="hidden" name="latitude" id="id_latitude">
-        <input type="hidden" name="longitude" id="id_longitude">
-        <input type="text" name="city" id="id_city">
-        <input type="text" name="state" id="id_state">       
+              
         <div class="row g-4">
     
             <!-- Name -->
