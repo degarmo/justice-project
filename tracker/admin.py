@@ -5,12 +5,11 @@ from django.utils.html import format_html
 from django.db.models import Count
 from datetime import datetime, timedelta
 from django.utils.timezone import make_aware
-from .models import VisitorLog, TipSubmission, BehavioralLog
+from .models import VisitorLog, TipSubmission, BehavioralLog, MessageOfLove
 from django.contrib.contenttypes.models import ContentType
 from tracker.utils.ai_analysis import analyze_behavior
 from django.utils.timezone import now
 from .models import BlogPost
-
 
 
 # VisitorLog Admin
@@ -196,3 +195,60 @@ class BlogPostAdmin(admin.ModelAdmin):
 
 # Register the report under ContentType
 admin.site.register(ContentType, ReportAdminView)
+
+
+
+class VisitorLogReport(admin.ModelAdmin):
+    list_display = [
+        'fingerprint_link', 'first_seen', 'last_seen', 'visit_count',
+        'has_tip', 'has_signed', 'has_gps', 'score', 'notes',
+    ]
+    readonly_fields = list_display
+
+    def fingerprint_link(self, obj):
+        return format_html(
+            '<a href="/admin/tracker/visitorlog/{}/change/">{}</a>',
+            obj.id,
+            obj.fingerprint_hash or obj.ip_address
+        )
+    fingerprint_link.short_description = "Visitor ID"
+
+    def first_seen(self, obj):
+        return obj.timestamp
+
+    def last_seen(self, obj):
+        return obj.behavior_logs.order_by('-timestamp').first().timestamp if obj.behavior_logs.exists() else obj.timestamp
+
+    def visit_count(self, obj):
+        return obj.behavior_logs.count()
+
+    def has_tip(self, obj):
+        return TipSubmission.objects.filter(visitor_log=obj).exists()
+
+    def has_signed(self, obj):
+        return MessageOfLove.objects.filter(visitor=obj).exists()
+
+    def has_gps(self, obj):
+        return any([
+            obj.latitude is not None,
+            MessageOfLove.objects.filter(visitor=obj, latitude__isnull=False).exists()
+        ])
+
+    def score(self, obj):
+        score = 10  # Start at full trust
+        if obj.vpn_status or obj.tor_status:
+            score -= 3
+        if not self.has_signed(obj):
+            score -= 2
+        if not self.has_gps(obj):
+            score -= 1
+        return max(score, 0)
+
+    def notes(self, obj):
+        if obj.vpn_status or obj.tor_status:
+            return "Anonymization tools detected"
+        if not self.has_signed(obj):
+            return "No public engagement"
+        return "Normal visitor"
+
+admin.site.register(VisitorLog, VisitorLogReport)
