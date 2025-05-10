@@ -8,7 +8,7 @@ from django.utils.timezone import make_aware, now
 from .models import VisitorLog, TipSubmission, BehavioralLog, MessageOfLove, BlogPost
 from django.contrib.contenttypes.models import ContentType
 from tracker.utils.ai_analysis import analyze_behavior
-
+from django.db.models import Max
 
 # TipSubmission Admin
 @admin.register(TipSubmission)
