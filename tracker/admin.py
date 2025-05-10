@@ -159,7 +159,6 @@ class CustomAdminSite(admin.AdminSite):
         return super().index(request, extra_context=extra_context)
 
 
-# VisitorLogReport Admin (REPLACES old VisitorLogAdmin)
 class VisitorLogReport(admin.ModelAdmin):
     list_display = [
         'fingerprint_link', 'first_seen', 'last_seen', 'visit_count',
@@ -167,24 +166,32 @@ class VisitorLogReport(admin.ModelAdmin):
     ]
     readonly_fields = list_display
 
-    def fingerprint_link(self, obj):
-        return format_html(
-            '<a href="/admin/tracker/visitorlog/{}/change/">{}</a>',
-            obj.id,
-            obj.fingerprint_hash or obj.ip_address
-        )
-    fingerprint_link.short_description = "Visitor ID"
+    def get_queryset(self, request):
+        # Step 1: Get latest entry for each unique fingerprint
+        latest_ids = VisitorLog.objects.values('fingerprint_hash').annotate(
+            latest_id=Max('id')
+        ).values_list('latest_id', flat=True)
 
-    def first_seen(self, obj): return obj.timestamp
+        # Step 2: Filter queryset to just those IDs
+        return VisitorLog.objects.filter(id__in=latest_ids)
+
+    def fingerprint_link(self, obj):
+        return obj.fingerprint_hash or obj.ip_address
+
+    def first_seen(self, obj):
+        return obj.timestamp
 
     def last_seen(self, obj):
         return obj.behavior_logs.order_by('-timestamp').first().timestamp if obj.behavior_logs.exists() else obj.timestamp
 
-    def visit_count(self, obj): return obj.behavior_logs.count()
+    def visit_count(self, obj):
+        return obj.behavior_logs.count()
 
-    def has_tip(self, obj): return TipSubmission.objects.filter(visitor_log=obj).exists()
+    def has_tip(self, obj):
+        return TipSubmission.objects.filter(visitor_log=obj).exists()
 
-    def has_signed(self, obj): return MessageOfLove.objects.filter(visitor=obj).exists()
+    def has_signed(self, obj):
+        return MessageOfLove.objects.filter(visitor=obj).exists()
 
     def has_gps(self, obj):
         return any([
@@ -203,20 +210,13 @@ class VisitorLogReport(admin.ModelAdmin):
         return max(score, 0)
 
     def notes(self, obj):
+        notes = []
         if obj.vpn_status or obj.tor_status:
-            return "Anonymization tools detected"
+            notes.append("⚠️ Anonymization tools detected")
         if not self.has_signed(obj):
-            return "No public engagement"
-        return "Normal visitor"
+            notes.append("No public engagement")
+        if not self.has_gps(obj):
+            notes.append("No geolocation")
+        return ", ".join(notes) if notes else "Normal visitor"
 
-
-# Register updated admin models
-admin.site.register(ContentType, ReportAdminView)
 admin.site.register(VisitorLog, VisitorLogReport)
-
-@admin.register(BlogPost)
-class BlogPostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
-    prepopulated_fields = {"slug": ("title",)}
-    search_fields = ('title',)
-    ordering = ('-created_at',)
