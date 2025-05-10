@@ -226,10 +226,8 @@ def index(request):
         'latest_post': latest_post
     })
 
-
-
-
 def memorial_page(request):
+    messages = MessageOfLove.objects.filter(show_location=True).order_by('-created_at')
     if request.method == 'POST':
         form = MessageOfLoveForm(request.POST)
         if form.is_valid():
