@@ -4,32 +4,10 @@ from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.db.models import Count
 from datetime import datetime, timedelta
-from django.utils.timezone import make_aware
-from .models import VisitorLog, TipSubmission, BehavioralLog, MessageOfLove
+from django.utils.timezone import make_aware, now
+from .models import VisitorLog, TipSubmission, BehavioralLog, MessageOfLove, BlogPost
 from django.contrib.contenttypes.models import ContentType
 from tracker.utils.ai_analysis import analyze_behavior
-from django.utils.timezone import now
-from .models import BlogPost
-
-
-# VisitorLog Admin
-@admin.register(VisitorLog)
-class VisitorLogAdmin(admin.ModelAdmin):
-    list_display = ('ip_address', 'city', 'region', 'country', 'vpn_status', 'tor_status', 'fingerprint_hash', 'timestamp')
-    readonly_fields = (
-        'ip_address', 'isp', 'asn', 'city', 'region', 'country',
-        'latitude', 'longitude', 'browser', 'os', 'device',
-        'vpn_status', 'tor_status', 'fingerprint_hash',
-        'referrer', 'user_agent', 'timestamp'
-    )
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['custom_button'] = format_html(
-            '<a class="button" href="{}">Generate Report</a>',
-            reverse('admin:tracker_report')
-        )
-        return super().changelist_view(request, extra_context=extra_context)
 
 
 # TipSubmission Admin
@@ -42,28 +20,22 @@ class TipSubmissionAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('visitor_log', 'timestamp', 'visitor_metadata')
 
-    def get_ip_address(self, obj):
-        return obj.visitor_log.ip_address if obj.visitor_log else None
+    def get_ip_address(self, obj): return obj.visitor_log.ip_address if obj.visitor_log else None
     get_ip_address.short_description = 'IP Address'
 
-    def get_vpn_status(self, obj):
-        return obj.visitor_log.vpn_status if obj.visitor_log else None
+    def get_vpn_status(self, obj): return obj.visitor_log.vpn_status if obj.visitor_log else None
     get_vpn_status.short_description = 'VPN?'
 
-    def get_tor_status(self, obj):
-        return obj.visitor_log.tor_status if obj.visitor_log else None
+    def get_tor_status(self, obj): return obj.visitor_log.tor_status if obj.visitor_log else None
     get_tor_status.short_description = 'Tor?'
 
-    def get_browser(self, obj):
-        return obj.visitor_log.browser if obj.visitor_log else None
+    def get_browser(self, obj): return obj.visitor_log.browser if obj.visitor_log else None
     get_browser.short_description = 'Browser'
 
-    def get_os(self, obj):
-        return obj.visitor_log.os if obj.visitor_log else None
+    def get_os(self, obj): return obj.visitor_log.os if obj.visitor_log else None
     get_os.short_description = 'OS'
 
-    def get_device(self, obj):
-        return obj.visitor_log.device if obj.visitor_log else None
+    def get_device(self, obj): return obj.visitor_log.device if obj.visitor_log else None
     get_device.short_description = 'Device'
 
     def visitor_metadata(self, obj):
@@ -94,7 +66,7 @@ class BehavioralLogAdmin(admin.ModelAdmin):
     get_visitor_ip.short_description = 'Visitor IP'
 
 
-# Report View
+# Report View Admin
 class ReportAdminView(admin.ModelAdmin):
     change_list_template = 'admin/tracker/report.html'
 
@@ -127,7 +99,6 @@ class ReportAdminView(admin.ModelAdmin):
 
                 visit_counts = visitors.values('ip_address', 'fingerprint_hash').annotate(visits=Count('id'))
 
-                # Build data
                 for visitor in visitors:
                     ip = visitor.ip_address or "Unknown IP"
                     fp = visitor.fingerprint_hash or "Unknown FP"
@@ -160,6 +131,8 @@ class ReportAdminView(admin.ModelAdmin):
 
         return TemplateResponse(request, "admin/tracker/report.html", context)
 
+
+# Admin override for dashboard behavior
 class CustomAdminSite(admin.AdminSite):
     site_header = "Tracker Admin Portal"
 
@@ -176,7 +149,7 @@ class CustomAdminSite(admin.AdminSite):
             behaviors = BehavioralLog.objects.filter(visitor=visitor)
             if behaviors.exists():
                 score = analyze_behavior(visitor, behaviors)
-                if score >= 5:  # Threshold to be considered 'nervous'
+                if score >= 5:
                     nervous_visitors.append({
                         'visitor': visitor,
                         'score': score,
@@ -184,20 +157,9 @@ class CustomAdminSite(admin.AdminSite):
 
         extra_context['nervous_visitors'] = nervous_visitors
         return super().index(request, extra_context=extra_context)
-    
-@admin.register(BlogPost)
-class BlogPostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
-    prepopulated_fields = {"slug": ("title",)}
-    search_fields = ('title',)
-    ordering = ('-created_at',)
 
 
-# Register the report under ContentType
-admin.site.register(ContentType, ReportAdminView)
-
-
-
+# VisitorLogReport Admin (REPLACES old VisitorLogAdmin)
 class VisitorLogReport(admin.ModelAdmin):
     list_display = [
         'fingerprint_link', 'first_seen', 'last_seen', 'visit_count',
@@ -213,20 +175,16 @@ class VisitorLogReport(admin.ModelAdmin):
         )
     fingerprint_link.short_description = "Visitor ID"
 
-    def first_seen(self, obj):
-        return obj.timestamp
+    def first_seen(self, obj): return obj.timestamp
 
     def last_seen(self, obj):
         return obj.behavior_logs.order_by('-timestamp').first().timestamp if obj.behavior_logs.exists() else obj.timestamp
 
-    def visit_count(self, obj):
-        return obj.behavior_logs.count()
+    def visit_count(self, obj): return obj.behavior_logs.count()
 
-    def has_tip(self, obj):
-        return TipSubmission.objects.filter(visitor_log=obj).exists()
+    def has_tip(self, obj): return TipSubmission.objects.filter(visitor_log=obj).exists()
 
-    def has_signed(self, obj):
-        return MessageOfLove.objects.filter(visitor=obj).exists()
+    def has_signed(self, obj): return MessageOfLove.objects.filter(visitor=obj).exists()
 
     def has_gps(self, obj):
         return any([
@@ -235,7 +193,7 @@ class VisitorLogReport(admin.ModelAdmin):
         ])
 
     def score(self, obj):
-        score = 10  # Start at full trust
+        score = 10
         if obj.vpn_status or obj.tor_status:
             score -= 3
         if not self.has_signed(obj):
@@ -251,4 +209,14 @@ class VisitorLogReport(admin.ModelAdmin):
             return "No public engagement"
         return "Normal visitor"
 
+
+# Register updated admin models
+admin.site.register(ContentType, ReportAdminView)
 admin.site.register(VisitorLog, VisitorLogReport)
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created_at')
+    prepopulated_fields = {"slug": ("title",)}
+    search_fields = ('title',)
+    ordering = ('-created_at',)
