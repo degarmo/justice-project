@@ -265,7 +265,7 @@ def confirm_message_log(request):
 
 
 def memory_map(request):
-    messages = MessageOfLove.objects.filter(show_location=True)
+    messages = MessageOfLove.objects.filter(show_location=True).order_by('-created_at')  # 👈 Add ordering here
     messages_json = json.dumps([
         {
             'display_name': msg.display_name,
