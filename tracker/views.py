@@ -227,7 +227,6 @@ def index(request):
     })
 
 def memorial_page(request):
-    messages = MessageOfLove.objects.filter(show_location=True).order_by('-created_at')
     if request.method == 'POST':
         form = MessageOfLoveForm(request.POST)
         if form.is_valid():
@@ -242,7 +241,7 @@ def memorial_page(request):
     else:
         form = MessageOfLoveForm()
 
-    messages = MessageOfLove.objects.all().order_by('-created_at')
+    messages = MessageOfLove.objects.filter(show_location=True).order_by('-created_at')
     return render(request, 'tracker/memorial_page.html', {'form': form, 'messages': messages})
 
 
