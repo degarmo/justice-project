@@ -1,10 +1,10 @@
 
-document.getElementById('share-location').addEventListener('change', function() {
+document.getElementById('id_show_location').addEventListener('change', function () {
     if (this.checked) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('latitude').value = position.coords.latitude;
-                document.getElementById('longitude').value = position.coords.longitude;
+                document.getElementById('id_latitude').value = position.coords.latitude;
+                document.getElementById('id_longitude').value = position.coords.longitude;
             }, function(error) {
                 alert("Location permission denied or unavailable.");
                 // Optional: uncheck the box or notify user
